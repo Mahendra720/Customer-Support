@@ -1,0 +1,30 @@
+{
+    "faqs":
+[
+  {
+    "id": "issue_products",
+    "question": "Issue with delivered product(s)",
+    "answer": "If your delivered product is damaged or not as described, you can request a replacement or refund within the app under order details."
+  },
+  {
+    "id": "can_return",
+    "question": "Can I return the delivery order?",
+    "answer": "Yes, you can return your delivered order within the return window specified in the app. Navigate to your order details and select ‘Return’ to initiate the process."
+  },
+  {
+    "id": "can_replace",
+    "question": "Can I replace my delivered order?",
+    "answer": "Yes, if you received the wrong item or a defective product, you can request a replacement through the app’s order support section."
+  },
+  {
+    "id": "issue_rider",
+    "question": "Report rider behaviour issues",
+    "answer": "To report inappropriate rider behaviour, please describe the incident and our support team will investigate promptly."
+  },
+  {
+    "id": "issue_missing",
+    "question": "Did not receive the order or missing items",
+    "answer": "If your order is missing items or not received, please reach out via support and we’ll assist you to resolve it or issue a refund."
+  }
+]
+}
