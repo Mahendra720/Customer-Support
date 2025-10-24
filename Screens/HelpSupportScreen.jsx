@@ -19,6 +19,7 @@ export default function HelpSupportScreen({ navigation }) {
   const [deliveredOrders, setDeliveredOrders] = useState([]);
   const [returnOrders, setReturnOrders] = useState([]);
   const [replacementOrders, setReplacementOrders] = useState([]);
+  const [ordersPlaced,setOrdersPlaced] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,9 +28,11 @@ export default function HelpSupportScreen({ navigation }) {
       try {
         const orders = await fetchOrders();
         const cats = await fetchCategories();
+         setOrdersPlaced(orders.filter((o) => o.status === "placed"));
         setDeliveredOrders(orders.filter((o) => o.status === "delivered"));
         setReturnOrders(orders.filter((o) => o.status === "returned"));
         setReplacementOrders(orders.filter((o) => o.status === "replaced"));
+       
         setCategories(cats);
       } catch (err) {
         console.error(err);
@@ -78,15 +81,19 @@ export default function HelpSupportScreen({ navigation }) {
             style={styles.horizontalScroll}
           >
             <View style={styles.ordersGroup}>
-              {deliveredOrders.length === 0 &&
+              { ordersPlaced.length === 0 &&
+              deliveredOrders.length === 0 &&
               returnOrders.length === 0 &&
-              replacementOrders.length === 0 ? (
+              replacementOrders.length === 0 
+             
+              
+              ? (
                 <Text style={styles.noOrdersText}>
                   No recent orders found.
                 </Text>
               ) : (
                 <>
-                  {deliveredOrders.map((order) => (
+                  {ordersPlaced.map((order) => (
                     <OrderCard
                       key={order.id}
                       order={order}
@@ -95,6 +102,16 @@ export default function HelpSupportScreen({ navigation }) {
                       }
                     />
                   ))}
+                   {deliveredOrders.map((order) => (
+                    <OrderCard
+                      key={order.id}
+                      order={order}
+                      onPress={() =>
+                        navigation.navigate("OrderDetail", { order })
+                      }
+                    />
+                  ))}
+
 
                   {returnOrders.map((order) => (
                     <OrderCard

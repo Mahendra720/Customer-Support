@@ -69,11 +69,13 @@ export default function OrderDetailScreen({ route, navigation }) {
             <View style={styles.statusRow}>
               <View style={styles.statusDot} />
               <Text style={styles.statusText}>
-                {order.status === 'delivered'
-                  ? 'Delivered'
-                  : order.status === 'returned'
-                  ? 'Returned'
-                  : 'Replaced'}
+                { order.status === 'placed'
+    ? 'Order placed'
+    : order.status === 'delivered'
+    ? 'Order delivered'
+    : order.status === 'returned'
+    ? 'Order returned'
+    : 'Order replaced'}
               </Text>
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>Arrived in</Text>
@@ -183,7 +185,10 @@ export default function OrderDetailScreen({ route, navigation }) {
           <TouchableWithoutFeedback
             onPressIn={() => animatePressIn(scaleHelp)}
             onPressOut={() => animatePressOut(scaleHelp)}
-            onPress={() => navigation.navigate('HelpOptionsScreen', { order })}
+            onPress={() => navigation.navigate('Chat', {
+  products: order.products,  // or order.items depending on your data
+  orderType: order.status    // e.g., 'delivered', 'returned', etc.
+})}
           >
             <Animated.View style={styles.helpRow}>
               <View style={styles.helpLeft}>

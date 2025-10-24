@@ -64,7 +64,7 @@ export const fetchOrders = async () => {
         id: 'order1',
         date: '12th Oct 25, 10:31 am',
         price: '₹64.54',
-        status: 'delivered',
+        status: 'placed',
         products: [
           { name: 'Biscuit Pack', image: 'https://media.istockphoto.com/id/503257367/photo/nabisco-oreo-milks-favorite-cookie-family-size-package.jpg?s=612x612&w=0&k=20&c=Tj2XBpV8w86xB76Zo-0nuENY7DvqNKZ2gxgv8jAZxWI=' },
           { name: 'Soft Drink', image: 'https://media.istockphoto.com/id/157726102/photo/classical-coca-cola-bottle.jpg?s=612x612&w=0&k=20&c=7s9UKO9O8ti8ELyt0A6-Rek-WITTG2m9y6joO8ETx8s=' },
@@ -74,6 +74,18 @@ export const fetchOrders = async () => {
       },
       {
         id: 'order2',
+        date: '12th Oct 25, 10:31 am',
+        price: '₹64.54',
+        status: 'delivered',
+        products: [
+          { name: 'Biscuit Pack', image: 'https://media.istockphoto.com/id/503257367/photo/nabisco-oreo-milks-favorite-cookie-family-size-package.jpg?s=612x612&w=0&k=20&c=Tj2XBpV8w86xB76Zo-0nuENY7DvqNKZ2gxgv8jAZxWI=' },
+          { name: 'Soft Drink', image: 'https://media.istockphoto.com/id/157726102/photo/classical-coca-cola-bottle.jpg?s=612x612&w=0&k=20&c=7s9UKO9O8ti8ELyt0A6-Rek-WITTG2m9y6joO8ETx8s=' },
+                    { name: 'Soft Drink', image: 'https://media.istockphoto.com/id/517416636/photo/milk-carton-with-custom-design.jpg?s=612x612&w=0&k=20&c=EoVARTiF1qDuPBPdDYPPlb0N8goW5RSBXcNV-eGR-7U=' },
+
+        ],
+      },
+      {
+        id: 'order3',
         date: '5th Oct 25, 2:15 pm',
         price: '₹120.00',
         status: 'returned',
@@ -85,7 +97,7 @@ export const fetchOrders = async () => {
         ],
       },
       {
-        id: 'order3',
+        id: 'order4',
         date: '29th Sep 25, 8:40 am',
         price: '₹89.99',
         status: 'replaced',

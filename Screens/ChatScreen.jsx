@@ -1,93 +1,55 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet, Image, Alert, SafeAreaView, StatusBar } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
+import React from "react";
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
-export default function ChatScreen({ route, navigation }) {
-  const { title } = route.params || {};
-
-  // Standard chat messages as before
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-
-  const handleAttachFile = async () => {
-    const { granted } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!granted) {
-      Alert.alert('Permission required', 'Permission to access gallery is required!');
-      return;
-    }
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-    if (!result.canceled) {
-      const imageUri = result.assets[0].uri;
-      setMessages([
-        ...messages,
-        { id: Math.random().toString(), user: 'customer', image: imageUri },
-      ]);
-    }
-  };
-
-  const sendMessage = () => {
-    if (input.trim().length > 0) {
-      setMessages([...messages, { id: Math.random().toString(), user: 'customer', text: input }]);
-      setInput('');
-    }
-  };
-
-  const renderItem = ({ item }) => (
-    <View style={[styles.msg, item.user === 'customer' ? styles.customer : styles.support]}>
-      {item.image ? (
-        <Image source={{ uri: item.image }} style={styles.chatImage} />
-      ) : (
-        <Text style={styles.messageText}>{item.text}</Text>
-      )}
-    </View>
-  );
+export default function ChatScreen({ navigation, route }) {
+  // Get the current order's products/images from navigation params
+  // These params should be sent from OrderDetailsScreen or wherever you navigate from
+  const products = route?.params?.products || [];
+  const orderType = route?.params?.orderType || "delivered"; // or "returned", etc
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-        <StatusBar barStyle="dark-content" backgroundColor="#fff" />
-      <View style={styles.headerWrap}>
-        <TouchableOpacity onPress={() => navigation.goBack()} accessibilityLabel="Back">
-          <Text style={styles.backIcon}>{'<'}</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerText}>Get Help</Text>
-        <View style={{ width: 24 }} />
-      </View>
-      <View style={styles.divider} />
-      {/* Info card exactly like the reference screenshot */}
+    <SafeAreaView style={styles.bg}>
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>
-          {title || "Issue with delivered product(s)"}
+        <Text style={styles.brand}>Okal</Text>
+        <Text style={styles.greeting}>
+          Hello! Welcome to Okal Support.{"\n"}
+          I’m here to assist you. Can you specify the issue with your order?
         </Text>
-        <Text style={styles.cardMessage}>
-          We're really sorry for the experience. Please reach out to us through the Chat option below.
-        </Text>
-      </View>
-      <View style={styles.container}>
-        <FlatList
-          data={messages}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.id}
-          style={styles.list}
-        />
-        <View style={styles.inputRow}>
-          <TouchableOpacity style={styles.iconBtn} onPress={handleAttachFile}>
-            <Ionicons name="attach" size={28} color="#888" />
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            placeholder="Type your message"
-            value={input}
-            onChangeText={setInput}
-          />
-          <TouchableOpacity style={styles.sendBtn} onPress={sendMessage}>
-            <Text style={{ color: '#fff', fontWeight: '600' }}>Send</Text>
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.bigButton}
+          onPress={() => navigation.navigate("SelectItemsAndIssues", {
+            products,
+            orderType,
+            category: "delivered",
+          })}
+        >
+          <Text style={styles.bigButtonText}>Issue with Delivered Items</Text>
+          <Text style={styles.arrow}>&gt;</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.bigButton}
+          onPress={() => navigation.navigate("SelectItemsAndIssues", {
+            products,
+            orderType,
+            category: "missing",
+          })}
+        >
+          <Text style={styles.bigButtonText}>Items are missing</Text>
+          <Text style={styles.arrow}>&gt;</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.bigButton}
+          onPress={() => navigation.navigate("SelectItemsAndIssues", {
+            products,
+            orderType,
+            category: "rider_behaviour",
+          })}
+        >
+          <Text style={styles.bigButtonText}>Report rider behaviour issues</Text>
+          <Text style={styles.arrow}>&gt;</Text>
+        </TouchableOpacity>
+        <View style={{ alignItems: "center", marginTop: 8 }}>
+          <Text style={styles.chevron}>⌄</Text>
         </View>
       </View>
     </SafeAreaView>
@@ -95,115 +57,59 @@ export default function ChatScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff', paddingVertical : 18, },
-  headerWrap: {
-    height: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 18,
-   
-
-    backgroundColor: '#fff',
-  },
-  backIcon: {
-    fontSize: 22,
-    color: '#2C114A',
-    width: 24,
-    textAlign: 'left',
-    marginRight: 4,
-  },
-  headerText: {
-    flex: 1,
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#2C114A',
-    textAlign: 'center',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#E5E5E5',
-    marginBottom: 2 ,
-    marginHorizontal: 0,
-  },
+  bg: { flex: 1, backgroundColor: "#f7f5fa" },
   card: {
-    
-    marginHorizontal: 18,
-    marginVertical:5,
+    backgroundColor: "#fff",
+    borderRadius: 18,
     padding: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
+    marginTop: 45,
+    elevation: 3,
     shadowColor: "#000",
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.04,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
   },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#2C114A',
-    marginBottom: 10,
+  brand: {
+    color: "#8B46EA",
+    fontWeight: "700",
+    fontSize: 21,
+    marginBottom: 2
   },
-  cardMessage: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#2C114A',
-    lineHeight: 22
+  greeting: {
+    fontSize: 19,
+    color: "#232323",
+    fontWeight: "500",
+    marginBottom: 18,
+    marginTop: 3,
   },
-  container: { flex: 1, backgroundColor: '#f6f6f6', padding: 8 },
-  list: { flex: 1 },
-  msg: {
-    padding: 10,
-    marginVertical: 4,
-    maxWidth: '70%',
-    borderRadius: 8,
-  },
-  customer: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#e6f3ff',
-  },
-  support: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#fff',
-  },
-  messageText: {
-    fontSize: 16,
-    fontWeight: '400',
-    color: '#333',
-    lineHeight: 24,
-  },
-  chatImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 10,
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-    backgroundColor: '#fff',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  input: {
-    flex: 1,
-    padding: 10,
-    backgroundColor: '#f3f3f3',
-    borderRadius: 20,
-    marginRight: 8,
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
-  },
-  sendBtn: {
-    backgroundColor: '#e53935',
-    paddingVertical: 10,
+  bigButton: {
+    borderWidth: 1,
+    borderColor: "#ece6fc",
+    backgroundColor: "#fbf9fd",
+    borderRadius: 13,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 18,
     paddingHorizontal: 18,
-    borderRadius: 20,
+    marginVertical: 5,
+    marginBottom: 7,
+    justifyContent: "space-between"
   },
-  iconBtn: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+  bigButtonText: {
+    fontSize: 18,
+    color: "#222",
+    fontWeight: "bold",
+  },
+  arrow: {
+    color: "#8B46EA",
+    fontSize: 21,
+    marginLeft: 12,
+    marginBottom: -2,
+    fontWeight: '800'
+  },
+  chevron: {
+    fontSize: 26,
+    color: "#8B46EA",
+    marginTop: 6
   },
 });

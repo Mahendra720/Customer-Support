@@ -6,7 +6,15 @@ export default function OrderCard({ order, onPress }) {
     <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
       <View style={styles.card}>
         <Text style={styles.status}>
-          {order.status === 'delivered' ? 'Order delivered' : order.status === 'returned' ? 'Order returned' : 'Order replaced'}
+{
+  order.status === 'placed'
+    ? 'Order placed'
+    : order.status === 'delivered'
+    ? 'Order delivered'
+    : order.status === 'returned'
+    ? 'Order returned'
+    : 'Order replaced'
+}
         </Text>
         <Text style={styles.date}>Placed at {order.date}</Text>
         <Text style={styles.price}>{order.price}</Text>

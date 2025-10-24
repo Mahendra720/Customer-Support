@@ -8,6 +8,8 @@ import ChatScreen from '../Screens/ChatScreen';
 import HelpIssueScreen from '../Screens/IssueScreen';
 import HelpOptionsScreen from '../Screens/HelpOptionsScreen';
 import HelpScreen from '../Screens/HelpScreen';
+import SelectItemsAndIssuesScreen from '../Screens/SelectItemsAndIssuesScreen';
+
 const Stack = createStackNavigator();
  
 export default function AppNavigator() {
@@ -20,6 +22,7 @@ export default function AppNavigator() {
      <Stack.Screen name="Chat" component={ChatScreen} options={{ title: 'Customer Chat',headerShown:false }}/>
      <Stack.Screen name="HelpOptionsScreen" component={HelpOptionsScreen}  options={{headerShown:false}}/>
      <Stack.Screen name="HelpScreen" component={HelpScreen} />
+     <Stack.Screen name="SelectItemsAndIssues" component={SelectItemsAndIssuesScreen} options={{ title: "Select items and issues" }} />
      <Stack.Screen
   name="HelpIssue"
   component={HelpIssueScreen}
