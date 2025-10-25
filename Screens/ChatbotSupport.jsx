@@ -69,6 +69,35 @@ const initialState = {
       ],
     },
   ],
+  returned: [
+    {
+      type: "bot",
+      message:
+        "I see you've already placed a return request. How can I help you today?",
+      options: [
+        {
+          id: "return_status",
+          name: "Check return status",
+          category: "returned_orders",
+        },
+        {
+          id: "pickup_issue",
+          name: "Issue with pickup",
+          category: "returned_orders",
+        },
+        {
+          id: "refund_status",
+          name: "Refund related query",
+          category: "returned_orders",
+        },
+        {
+          id: "cancel_return",
+          name: "Cancel my return request",
+          category: "returned_orders",
+        },
+      ],
+    },
+  ],
 };
 
 const ChatbotSupport = ({ route }) => {
@@ -85,6 +114,7 @@ const ChatbotSupport = ({ route }) => {
   });
 
   const selectedSlot = useRef(null);
+  const selectedItem = useRef(null);
 
   const flatListRef = useRef(null);
 
@@ -172,6 +202,19 @@ const ChatbotSupport = ({ route }) => {
         name: value,
         next_step: "collect_description",
       });
+    } else if (showInputModal.type === "enter_quantity") {
+      handleClickQuery({
+        id: "issue_with_quantity",
+        name: value,
+        next_step: "enter_received_quantity",
+      });
+    } else if (showInputModal.type === "customized_time_slot") {
+      selectedSlot.current = value;
+      handleClickQuery({
+        id: "reschedule_order",
+        name: value,
+        next_step: "choose_new_slot",
+      });
     } else {
       const userQuery = {
         type: "user",
@@ -202,8 +245,8 @@ const ChatbotSupport = ({ route }) => {
     // home
     // const BASE_URL = "http://10.223.171.9:8000/api";
     // work
-    // const BASE_URL = "http://192.168.1.19:8000/api";
-    const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
+    const BASE_URL = "http://192.168.1.19:8000/api";
+    // const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
 
     // if (option.id === "show_available_offers") {
     //   router.push("/offerspage");
@@ -212,7 +255,7 @@ const ChatbotSupport = ({ route }) => {
 
     if (
       option.id === "connect_delivery_partner" ||
-      option.id === "request_callback" ||
+      // option.id === "request_callback" ||
       option.id === "contact_support"
     ) {
       await Linking.openURL("tel:+9988776655");
@@ -251,7 +294,79 @@ const ChatbotSupport = ({ route }) => {
       return;
     }
 
-    // console.log("option", option);
+    if (
+      option.id === "reschedule_pickup" ||
+      option.category === "reschedule_pickup"
+    ) {
+      if (option.id === "customized_time_slot") {
+        setShowInputModal({
+          value: true,
+          type: "customized_time_slot",
+        });
+        return;
+      }
+      const response = await fetch(`${BASE_URL}/reschedule_pickup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          current_step: option.next_step || "select_time_slot",
+          orderId,
+          selectedSlot: selectedSlot.current || option.id,
+        }),
+      });
+      const data = await response.json();
+      const botMessage = {
+        type: "bot",
+        ...data,
+      };
+      setMessages((prev) => [...prev, botMessage]);
+      setLoading(false);
+      return;
+    }
+
+    if (
+      option.id === "issue_with_quantity" ||
+      option.category === "issue_with_quantity"
+    ) {
+      if (option.next_step === "select_item_with_issue") {
+        selectedItem.current = option.name;
+      }
+      if (option.id === "enter_quantity") {
+        setShowInputModal({
+          value: true,
+          type: "enter_quantity",
+        });
+        setLoading(false);
+        return;
+      }
+      const response = await fetch(`${BASE_URL}/issue_with_quantity`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          current_step: option.next_step || "select_order",
+          orderId: orderId,
+          item_with_issue: selectedItem.current || option.id,
+          resolution_choice: option.id,
+          confirm_report: option.id,
+          received_quantity: value,
+        }),
+      });
+
+      const data = await response.json();
+
+      const botMessage = {
+        type: "bot",
+        ...data,
+      };
+      // await delay(1000);
+      setMessages((prev) => [...prev, botMessage]);
+      setLoading(false);
+    }
+
     if (option.id === "missing_item" || option.category === "missing_item") {
       const response = await fetch(`${BASE_URL}/missing_item`, {
         method: "POST",
@@ -277,6 +392,7 @@ const ChatbotSupport = ({ route }) => {
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
     }
+    // console.log("option", option);
 
     if (
       option.id === "issue_with_delivery_partner" ||
@@ -318,8 +434,20 @@ const ChatbotSupport = ({ route }) => {
       option.id === "reschedule_order" ||
       option.category === "reschedule_order"
     ) {
-      if (option.id.includes("Today") || option.id === "choose_new_slot") {
-        selectedSlot.current = option.id;
+      console.log(option);
+      if (option.id === "Customized time slot") {
+        setShowInputModal({
+          value: true,
+          type: "customized_time_slot",
+        });
+        setLoading(false);
+        return;
+      }
+      if (
+        option.next_step === "choose_new_slot" ||
+        option.id === "choose_new_slot"
+      ) {
+        selectedSlot.current = option.name;
       }
       const response = await fetch(`${BASE_URL}/reschedule_order`, {
         method: "POST",
