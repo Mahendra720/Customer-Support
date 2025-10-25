@@ -1,20 +1,20 @@
-import React, { useState } from "react";
-import { Pressable, Text, TouchableOpacity, View } from "react-native";
+
+import { useNavigation } from "@react-navigation/native";
+import React from "react";
+import { TouchableOpacity, Text, View } from "react-native";
+import { useRating } from "../store/RatingContext";
 
 const emojis = [
-  { id: 1, symbol: "😡", label: "Awful" },
-  { id: 2, symbol: "😢", label: "Bad" },
+  { id: 1, symbol: "😠", label: "Awful" },
+  { id: 2, symbol: "☹️", label: "Bad" },
   { id: 3, symbol: "😐", label: "Okay" },
-  { id: 4, symbol: "😀", label: "Good" },
-  { id: 5, symbol: "🥰", label: "Excellent" },
+  { id: 4, symbol: "🙂", label: "Good" },
+  { id: 5, symbol: "😍", label: "Excellent" },
 ];
 
-// interface FeedbackModalProps {
-//   onRestartChat?: () => void;
-// }
-
-const FeedbackModal = ({ navigation, onRestartChat }) => {
-  const [selected, setSelected] = useState("");
+const FeedbackModal = () => {
+  const { rating, setRating } = useRating();
+  const navigation = useNavigation();
 
   return (
     <View
@@ -31,32 +31,40 @@ const FeedbackModal = ({ navigation, onRestartChat }) => {
       </Text>
 
       {/* Emoji rating row */}
-      <View style={{ flexDirection: "row", justifyContent: "center", gap: 12 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          gap: 12,
+        }}
+      >
         {emojis.map((e) => (
           <TouchableOpacity
+            key={e.id}
             onPress={() => {
-              setSelected(e.id);
+              setRating(e.id);
               navigation.navigate("ChatbotFeedback");
             }}
-            key={e.id}
             style={{
               padding: 5,
-              transform: [{ scale: selected === e.id ? 1.2 : 1 }],
+              transform: [{ scale: rating === e.id ? 1.2 : 1 }],
             }}
           >
-            <Text style={{ fontSize: 32 }}>{e.symbol}</Text>
+            {/* 👇 Inactive emojis are gray; active is normal */}
+            <Text
+              style={{
+                fontSize: 32,
+                opacity: rating === e.id ? 1 : 0.3, // makes others gray
+              }}
+            >
+              {e.symbol}
+            </Text>
           </TouchableOpacity>
         ))}
       </View>
-
-      <Pressable onPress={onRestartChat} style={{ marginTop: 16 }}>
-        <Text>
-          Still have an issue?{" "}
-          <Text style={{ color: "green" }}>Talk to an agent</Text>
-        </Text>
-      </Pressable>
     </View>
   );
 };
 
 export default FeedbackModal;
+
