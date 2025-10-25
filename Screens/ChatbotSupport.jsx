@@ -245,8 +245,8 @@ const ChatbotSupport = ({ route }) => {
     // home
     // const BASE_URL = "http://10.223.171.9:8000/api";
     // work
-    const BASE_URL = "http://192.168.1.19:8000/api";
-    // const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
+    // const BASE_URL = "http://192.168.1.19:8000/api";
+    const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
 
     // if (option.id === "show_available_offers") {
     //   router.push("/offerspage");
