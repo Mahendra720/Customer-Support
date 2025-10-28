@@ -11,7 +11,7 @@ const InputModal = ({ value, text, setValue, onClose, handleSubmit }) => {
         zIndex: 10,
         alignItems: "center",
         justifyContent: "flex-end",
-        marginTop: 10,
+        marginTop: -40,
         paddingVertical: 10,
         backgroundColor: "#00000080",
       }}

@@ -38,15 +38,21 @@ const TypingIndicator = () => {
   return (
     <View style={styles.container}>
       <View style={styles.bubble}>
-        <Text style={styles.text}>Zippybuddy is typing</Text>
+        {/* <Text style={styles.text}>Zippybuddy is typing</Text> */}
         <View style={styles.dotsContainer}>
-          <Animated.Text style={[styles.dot, { transform: [{ translateY: dot1 }] }]}>
+          <Animated.Text
+            style={[styles.dot, { transform: [{ translateY: dot1 }] }]}
+          >
             ●
           </Animated.Text>
-          <Animated.Text style={[styles.dot, { transform: [{ translateY: dot2 }] }]}>
+          <Animated.Text
+            style={[styles.dot, { transform: [{ translateY: dot2 }] }]}
+          >
             ●
           </Animated.Text>
-          <Animated.Text style={[styles.dot, { transform: [{ translateY: dot3 }] }]}>
+          <Animated.Text
+            style={[styles.dot, { transform: [{ translateY: dot3 }] }]}
+          >
             ●
           </Animated.Text>
         </View>
@@ -61,6 +67,7 @@ const styles = {
     alignItems: "center",
     marginVertical: 8,
     marginLeft: 10,
+    paddingVertical: 20,
   },
   bubble: {
     backgroundColor: "#F8FAFC",

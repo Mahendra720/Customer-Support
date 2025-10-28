@@ -159,7 +159,7 @@ const ChatbotSupport = ({ route }) => {
   const selectedSlot = useRef(null);
   const selectedItem = useRef(null);
 
-  const flatListRef = useRef(null);
+  const scrollToEndRef = useRef(null);
 
   useEffect(() => {
     if (rating) {
@@ -189,9 +189,14 @@ const ChatbotSupport = ({ route }) => {
     }
 
     // fetchInitial();
+    // if (scrollToEndRef.current) {
+    //   scrollToEndRef.current?.scrollTo({ animated: true });
+    // }
 
-    flatListRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+    setTimeout(() => {
+      scrollToEndRef.current?.scrollToEnd({ animated: true });
+    }, 100);
+  }, [messages.length]);
 
   const handleUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -781,16 +786,6 @@ const ChatbotSupport = ({ route }) => {
     setLoading(false);
   };
 
-  // const renderItem = ({ item, index }) => {
-  //   const isBot = item.type === "bot";
-
-  //   return isBot ? (
-  //     <Bot key={index} response={item} handleClick={handleClickQuery} />
-  //   ) : (
-  //     <User key={index} response={item} />
-  //   );
-  // };
-
   const renderItem = ({ item, index }) => {
     const isBot = item.type === "bot";
 
@@ -812,15 +807,17 @@ const ChatbotSupport = ({ route }) => {
         <View
           style={{
             flex: 1,
-            marginTop: -20,
+            marginTop: -40,
             backgroundColor: "lightgray",
+            paddingVertical: 10,
+            // paddingBottom: 120,
           }}
         >
           {/* chat messages */}
 
           <View style={{ flex: 1 }}>
             <FlatList
-              ref={flatListRef}
+              ref={scrollToEndRef}
               data={messages}
               renderItem={renderItem}
               keyExtractor={(item, index) => index.toString()}
@@ -828,21 +825,13 @@ const ChatbotSupport = ({ route }) => {
                 gap: 20,
                 paddingHorizontal: 10,
                 paddingVertical: 10,
-              }}
-              style={{
-                paddingBottom: 100,
-                borderColor: "red",
+                paddingBottom: showFeedback ? 120 : 100,
               }}
               ListFooterComponent={loading ? <TypingIndicator /> : null}
             />
           </View>
 
           {showFeedback && (
-            // <FeedbackModal
-            //   onRestartChat={() => setShowFeedBack(false)}
-            //   orderType={orderType}
-            //   orderId={orderId}
-            // />
             <FeedbackModal
               onRestartChat={() => setShowFeedBack(false)}
               style={{ backgroundColor: "black" }}
