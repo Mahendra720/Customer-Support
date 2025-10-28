@@ -51,6 +51,6 @@ export default function FAQCategoryScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { paddingBottom: 20, paddingHorizontal: 16 },
-  header: { fontSize: 22, paddingVertical: 16, fontWeight: 'bold' },
+  container: { paddingBottom: 20, paddingHorizontal: 20},
+  header: { fontSize: 20, paddingVertical: 10, fontWeight: '500',color:'#000080' },
 });

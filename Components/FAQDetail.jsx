@@ -11,7 +11,7 @@ export default function FAQDetail({ faq }) {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 16 },
-  question: { fontWeight: 'bold', fontSize: 18, marginBottom: 8 },
-  answer: { fontSize: 16, color: '#333' },
+  container: { padding: 10,backgroundColor:'#E6E6FA',borderRadius:15 },
+  question: { fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
+  answer: { fontSize: 15, color: '#4d4848ff' },
 });

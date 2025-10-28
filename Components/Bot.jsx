@@ -1,6 +1,5 @@
-// import { getCurrentTime } from "@/utils";
 import React from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, StyleSheet } from "react-native";
 import { getCurrentTime } from "../lib/utils";
 
 // interface BotProps {
@@ -18,126 +17,187 @@ const Bot = ({ response, handleClick }) => {
     response.message.includes("you rated this conversation")
   ) {
     return (
-      <View
-        style={{
-          backgroundColor: "#FFF8E1",
-          padding: 10,
-          borderRadius: 8,
-          marginBottom: 12,
-          width: "90%",
-        }}
-      >
-        <Text style={{ textAlign: "center" }}>✅ {response.message}</Text>
+      <View style={styles.conversationEndedContainer}>
+        <Text style={styles.conversationEndedText}>
+          ✅ Conversation completed
+        </Text>
+
+        {/* Clickable text for still have questions */}
+        <Pressable
+          onPress={() =>
+            handleClick({ id: "main_menu", name: "Go to main menu" })
+          }
+        >
+          <Text style={styles.stillQueryText}>Still have questions?</Text>
+        </Pressable>
       </View>
     );
   }
 
   return (
-    <View
-      style={{
-        backgroundColor: "white",
-        width: "auto",
-        maxWidth: "70%",
-        borderRadius: 10,
-      }}
-    >
-      <View
-        style={{
-          paddingHorizontal: 10,
-          paddingVertical: 10,
-          // backgroundColor: "#B39DDB",
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
-          backgroundColor: "#dfe5ee",
-        }}
-      >
-        <Text
-          style={{
-            color: "#000080",
-            fontSize: 14,
-            fontWeight: "700",
-            marginBottom: 5,
-          }}
-        >
-          Okalbuddy
-        </Text>
-        <Text style={{ fontSize: 15 }}>{response.message}</Text>
-        <View style={{ justifyContent: "center", alignItems: "flex-end" }}>
-          <Text style={{ fontSize: 12 }}>{getCurrentTime()}</Text>
+    <View style={styles.botContainer}>
+      {/* Message Header */}
+      <View style={styles.messageHeader}>
+        <View style={styles.headerRow}>
+          <Text style={styles.botName}>Okalbuddy</Text>
+          <Text style={styles.timeText}>{getCurrentTime()}</Text>
         </View>
+        <Text style={styles.messageText}>{response.message}</Text>
       </View>
 
+      {/* Options Section */}
       {response.options ? (
-        <View>
+        <View style={styles.optionsContainer}>
           {response.options.map((option, index, arr) => (
             <Pressable
               onPress={() => handleClick(option)}
-              style={{
-                paddingVertical: 10,
-                paddingHorizontal: 10,
-                borderBottomWidth: index === arr.length - 1 ? 0 : 1,
-                borderColor: "gray",
-              }}
+              style={({ pressed }) => [
+                styles.optionItem,
+                index !== arr.length - 1 && styles.optionItemWithBorder,
+                pressed && styles.optionPressed,
+              ]}
               key={option.id}
             >
-              <Text
-                style={{
-                  color: "#4169E1",
-                  fontWeight: "900",
-                  fontSize: 16,
-                }}
-              >
-                {option.name}
-              </Text>
+              <Text style={styles.optionText}>{option.name}</Text>
             </Pressable>
           ))}
         </View>
       ) : (
-        <View>
+        <View style={styles.optionsContainer}>
           <Pressable
             onPress={() =>
               handleClick({ id: "end_conversation", name: "Okay, got it" })
             }
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 10,
-              borderBottomWidth: 1,
-              borderColor: "gray",
-            }}
+            style={({ pressed }) => [
+              styles.optionItem,
+              styles.optionItemWithBorder,
+              pressed && styles.optionPressed,
+            ]}
           >
-            <Text
-              style={{
-                color: "#4169E1",
-                fontWeight: "900",
-                fontSize: 16,
-              }}
-            >
-              Okay, got it
-            </Text>
+            <Text style={styles.gotItText}>Okay, got it</Text>
           </Pressable>
           <Pressable
             onPress={() =>
               handleClick({ id: "main_menu", name: "Go back to main menu" })
             }
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 10,
-            }}
+            style={({ pressed }) => [
+              styles.optionItem,
+              pressed && styles.optionPressed,
+            ]}
           >
-            <Text
-              style={{
-                color: "#4169E1",
-                fontWeight: "900",
-                fontSize: 16,
-              }}
-            >
-              Go back to main menu
-            </Text>
+            <Text style={styles.menuText}>Go back to main menu</Text>
           </Pressable>
         </View>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  conversationEndedContainer: {
+    backgroundColor: "#F0F9FF",
+    padding: 20,
+    borderRadius: 16,
+    marginBottom: 16,
+    width: "90%",
+    alignSelf: "center",
+    borderLeftWidth: 4,
+    borderLeftColor: "#3B82F6",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    alignItems: "center",
+  },
+  conversationEndedText: {
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#1E40AF",
+    marginBottom: 8,
+  },
+  stillQueryText: {
+    textAlign: "center",
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#3B82F6",
+    textDecorationLine: "underline",
+  },
+  botContainer: {
+    backgroundColor: "white",
+    width: "auto",
+    maxWidth: "85%",
+    borderRadius: 20,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  messageHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#F8FAFC",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  botName: {
+    color: "#1E40AF",
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  timeText: {
+    fontSize: 12,
+    color: "#6B7280",
+    fontWeight: "500",
+  },
+  messageText: {
+    fontSize: 16,
+    lineHeight: 22,
+    color: "#1E40AF",
+    fontWeight: "500",
+  },
+  optionsContainer: {
+    paddingVertical: 4,
+  },
+  optionItem: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+  optionItemWithBorder: {
+    borderBottomWidth: 1,
+    borderColor: "#F3F4F6",
+  },
+  optionPressed: {
+    backgroundColor: "#F9FAFB",
+  },
+  optionText: {
+    color: "#374151",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+  gotItText: {
+    color: "#059669",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+  menuText: {
+    color: "#D97706",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+});
 
 export default Bot;

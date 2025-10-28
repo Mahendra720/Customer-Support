@@ -749,149 +749,6 @@ const ChatbotSupport = ({ route }) => {
       } catch (error) {}
     }
 
-    // if (option.id === "cancel_order") {
-    //   console.log("cancel_order", option);
-    //   const res = await fetch(`${BASE_URL}/orders/active`);
-    //   const orders = await res.json();
-
-    //   // Show orders as clickable buttons
-    //   const orderOptions = orders.map((order) => ({
-    //     id: order.id,
-    //     name: `${order.id} - ${order.items.join(", ")}`,
-    //     category: "cancel_order",
-    //   }));
-
-    //   const botMessage = {
-    //     type: "bot",
-    //     message: "Please select the order you want to cancel",
-    //     options: orderOptions,
-    //   };
-    //   // await delay(300);
-    //   // setLoading(true);
-    //   await delay(300);
-    //   setMessages((prev) => [...prev, botMessage]);
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // if (option.id.startsWith("OD") && option.category === "cancel_order") {
-    //   const botMessage = {
-    //     type: "bot",
-    //     message: `Are you sure you want to cancel?`,
-    //     options: [
-    //       {
-    //         id: "yes",
-    //         name: "Yes",
-    //         category: option.id,
-    //       },
-    //       {
-    //         id: "no",
-    //         name: "No",
-    //         category: option.id,
-    //       },
-    //     ],
-    //   };
-
-    //   await delay(3000);
-    //   setMessages((prev) => [...prev, botMessage]);
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // if (option.id === "yes") {
-    //   // Step 1: Ask for reason before cancelling
-    //   const botMessage = {
-    //     type: "bot",
-    //     message: "Please tell us why you’d like to cancel your order.",
-    //     options: [
-    //       { id: "reason_wrong_item", name: "Ordered the wrong item" },
-    //       { id: "reason_delayed", name: "Delivery taking too long" },
-    //       { id: "reason_changed_mind", name: "Changed my mind" },
-    //       { id: "reason_other", name: "Other reasons" },
-    //     ],
-    //   };
-
-    //   await delay(800);
-    //   setMessages((prev) => [...prev, botMessage]);
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // if (
-    //   option.id === "reason_wrong_item" ||
-    //   option.id === "reason_delayed" ||
-    //   option.id === "reason_changed_mind" ||
-    //   option.id === "reason_other"
-    // ) {
-    //   let message;
-
-    //   switch (option.id) {
-    //     case "reason_wrong_item":
-    //       message = "Got it. You ordered the wrong item.";
-    //       break;
-    //     case "reason_delayed":
-    //       message = "Got it. The delivery is delayed.";
-    //       break;
-    //     case "reason_changed_mind":
-    //       message = "Understood. You changed your mind.";
-    //       break;
-    //     default:
-    //       message = "Thank you for sharing.";
-    //   }
-
-    //   // const botMessage1: MessagesType = {
-    //   //   type: "bot",
-    //   //   message: `${message} We’re processing your cancellation request...`,
-    //   // };
-
-    //   await delay(1000);
-
-    //   const botMessage2 = {
-    //     type: "bot",
-    //     message:
-    //       "✅ Your order has been successfully cancelled. The refund will be processed within 3–5 business days.",
-    //   };
-
-    //   // setMessages((prev) => [...prev, botMessage1]);
-    //   await delay(1500);
-    //   setMessages((prev) => [...prev, botMessage2]);
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // if (option.id === "yes") {
-    //   // await delay(300);
-    //   // setLoading(true);
-    //   let botMessage: MessagesType;
-    //   if (option.category === "OD1234") {
-    //     botMessage = {
-    //       type: "bot",
-    //       message: `✅ order ${option.category} has been successfully cancelled. The refund will be processed within 3–5 business days.`,
-    //     };
-    //   } else {
-    //     botMessage = {
-    //       type: "bot",
-    //       message: `Your order ${option.category} can't be cancelled. But you can return your order once delivered.`,
-    //     };
-    //   }
-
-    //   await delay(3000);
-    //   setMessages((prev) => [...prev, botMessage]);
-    //   setLoading(false);
-    //   return;
-    // }
-
-    // if (option.id === "no") {
-    //   const botMessage = {
-    //     type: "bot",
-    //     message: "No problem. Your order will continue as scheduled.",
-    //   };
-    //   await delay(3000);
-    //   setMessages((prev) => [...prev, botMessage]);
-    //   setLoading(false);
-    //   return;
-    // }
-
     if (option.id === "product_not_available") {
       await delay(300);
       setShowInputModal({
@@ -924,6 +781,16 @@ const ChatbotSupport = ({ route }) => {
     setLoading(false);
   };
 
+  // const renderItem = ({ item, index }) => {
+  //   const isBot = item.type === "bot";
+
+  //   return isBot ? (
+  //     <Bot key={index} response={item} handleClick={handleClickQuery} />
+  //   ) : (
+  //     <User key={index} response={item} />
+  //   );
+  // };
+
   const renderItem = ({ item, index }) => {
     const isBot = item.type === "bot";
 
@@ -946,6 +813,7 @@ const ChatbotSupport = ({ route }) => {
           style={{
             flex: 1,
             marginTop: -20,
+            backgroundColor: "lightgray",
           }}
         >
           {/* chat messages */}
@@ -962,52 +830,22 @@ const ChatbotSupport = ({ route }) => {
                 paddingVertical: 10,
               }}
               style={{
-                paddingBottom: 50,
+                paddingBottom: 100,
+                borderColor: "red",
               }}
               ListFooterComponent={loading ? <TypingIndicator /> : null}
             />
           </View>
 
-          {/* input */}
-          {/* <View
-            style={{
-              height: 80,
-              backgroundColor: "white",
-              justifyContent: "center",
-              paddingHorizontal: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-            }}
-          >
-            <TextInput
-              placeholder="Type your query here."
-              style={{
-                flex: 1,
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 100,
-              }}
-            />
-            <View
-              style={{
-                height: 40,
-                width: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 100,
-              }}
-            >
-              <Ionicons name="send" size={20} />
-            </View>
-          </View> */}
           {showFeedback && (
+            // <FeedbackModal
+            //   onRestartChat={() => setShowFeedBack(false)}
+            //   orderType={orderType}
+            //   orderId={orderId}
+            // />
             <FeedbackModal
               onRestartChat={() => setShowFeedBack(false)}
-              orderType={orderType}
-              orderId={orderId}
+              style={{ backgroundColor: "black" }}
             />
           )}
         </View>
