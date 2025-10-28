@@ -6,9 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  SafeAreaView,
+  // SafeAreaView,
   Linking,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useEffect, useRef, useState } from "react";
 import Bot from "../Components/Bot";
 import User from "../Components/User";
@@ -35,12 +36,6 @@ const initialState = {
           category: "orders_related",
         },
         {
-          id: "cancel_order",
-          name: "Cancel Order",
-          category: "cancel_order",
-        },
-
-        {
           id: "modifying_order",
           name: "Modifying Order",
           category: "orders_related",
@@ -49,6 +44,11 @@ const initialState = {
           id: "reschedule_order",
           name: "Reschedule Order",
           category: "orders_related",
+        },
+        {
+          id: "cancel_order",
+          name: "Cancel Order",
+          category: "cancel_order",
         },
       ],
     },
@@ -60,7 +60,7 @@ const initialState = {
       options: [
         {
           id: "issue_with_products",
-          name: "Issue with products",
+          name: "Return & Replacement",
         },
         {
           id: "issue_with_delivery_partner",
@@ -98,11 +98,54 @@ const initialState = {
       ],
     },
   ],
+  replaced: [
+    {
+      type: "bot",
+      message: `Which concern may i help you with?`,
+      options: [
+        {
+          id: "track_status",
+          name: "Track replacement status",
+          category: "replacement_queries",
+        },
+        {
+          id: "delay_in_replacement",
+          name: "Replacement delayed",
+          category: "replacement_queries",
+        },
+        {
+          id: "pickup_not_done",
+          name: "Pickup not done yet",
+          category: "replacement_queries",
+        },
+        {
+          id: "reschedule_pickup",
+          name: "Reschedule pickup",
+          category: "replacement_queries",
+        },
+        {
+          id: "not_received",
+          name: "Didn’t receive replacement item",
+          category: "replacement_queries",
+        },
+        {
+          id: "cancel_replacement",
+          name: "Cancel replacement request",
+          category: "replacement_queries",
+        },
+      ],
+    },
+  ],
 };
 
+// home
+// const BASE_URL = "http://10.223.171.9:8000/api";
+// work
+// const BASE_URL = "http://192.168.54.108:8000/api";
+const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
+
 const ChatbotSupport = ({ route }) => {
-  const { orderType, orderId } = route.params;
-  console.log(orderType, orderId);
+  const { orderType, orderId, rating } = route.params;
 
   const [messages, setMessages] = useState(initialState[orderType]);
   const [loading, setLoading] = useState(false);
@@ -117,6 +160,16 @@ const ChatbotSupport = ({ route }) => {
   const selectedItem = useRef(null);
 
   const flatListRef = useRef(null);
+
+  useEffect(() => {
+    if (rating) {
+      const botMessage = {
+        type: "bot",
+        message: `you rated this conversation as ${rating}`,
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    }
+  }, [rating]);
 
   useEffect(() => {
     async function fetchInitial() {
@@ -179,7 +232,7 @@ const ChatbotSupport = ({ route }) => {
         id: "cancel_order",
         name: value,
         category: "cancel_order",
-        next_step: "order_cancel_confirmation",
+        next_step: "choose_cancel_type",
       });
     } else if (showInputModal.type === "add_new_item") {
       handleClickQuery({
@@ -211,9 +264,13 @@ const ChatbotSupport = ({ route }) => {
     } else if (showInputModal.type === "customized_time_slot") {
       selectedSlot.current = value;
       handleClickQuery({
-        id: "reschedule_order",
+        id:
+          orderType === "replaced" ? "replacement_queries" : "reschedule_order",
         name: value,
-        next_step: "choose_new_slot",
+        next_step:
+          orderType === "replaced"
+            ? "reschedule_pickup_slot"
+            : "choose_new_slot",
       });
     } else {
       const userQuery = {
@@ -241,13 +298,40 @@ const ChatbotSupport = ({ route }) => {
     // setValue("");
   };
 
-  const handleClickQuery = async (option) => {
-    // home
-    // const BASE_URL = "http://10.223.171.9:8000/api";
-    // work
-    // const BASE_URL = "http://192.168.1.19:8000/api";
-    const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
+  const handleReplacementQueries = async (option) => {
+    console.log("replacement_queries", option);
+    if (option.id === "customized_time_slot") {
+      setShowInputModal({
+        value: true,
+        type: "customized_time_slot",
+      });
+      return;
+    }
+    const response = await fetch(`${BASE_URL}/replacement_queries`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        current_step: option.next_step || option.id,
+        orderId,
+        issue_type: option.id,
+        selectedSlot: option.name,
+        confirm: option.id,
+      }),
+    });
+    const data = await response.json();
+    console.log(data);
+    const botMessage = {
+      type: "bot",
+      ...data,
+    };
+    setMessages((prev) => [...prev, botMessage]);
+    setLoading(false);
+    return;
+  };
 
+  const handleClickQuery = async (option) => {
     // if (option.id === "show_available_offers") {
     //   router.push("/offerspage");
     //   return;
@@ -291,6 +375,14 @@ const ChatbotSupport = ({ route }) => {
 
       setMessages((prev) => [...prev, prev[0]]);
       setLoading(false);
+      return;
+    }
+
+    if (
+      option.id === "replacement_queries" ||
+      option.category === "replacement_queries"
+    ) {
+      handleReplacementQueries(option);
       return;
     }
 
@@ -566,6 +658,7 @@ const ChatbotSupport = ({ route }) => {
         setLoading(false);
         return;
       }
+      console.log("cancel_order", option);
       try {
         const response = await fetch(`${BASE_URL}/cancel_order`, {
           method: "POST",
@@ -573,9 +666,10 @@ const ChatbotSupport = ({ route }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            current_step: option.next_step || "show_active_orders",
+            current_step: option.next_step || "show_reasons",
             orderId: orderId,
             selected_item: option.name,
+            refund_mode: option.id,
           }),
         });
         const data = await response.json();
@@ -593,6 +687,7 @@ const ChatbotSupport = ({ route }) => {
       console.log("damaged_item", option);
       if (option.id === "upload_image") {
         handleUpload();
+        await delay(3000);
       }
       try {
         const response = await fetch(`${BASE_URL}/damaged_item`, {
@@ -847,15 +942,10 @@ const ChatbotSupport = ({ route }) => {
           flex: 1,
         }}
       >
-        {/* <View style={styles.header}>
-          <MaterialCommunityIcons name="arrow-left" size={18} />
-
-          <Text>Okal Support</Text>
-        </View> */}
-
         <View
           style={{
             flex: 1,
+            marginTop: -20,
           }}
         >
           {/* chat messages */}
@@ -876,15 +966,6 @@ const ChatbotSupport = ({ route }) => {
               }}
               ListFooterComponent={loading ? <TypingIndicator /> : null}
             />
-            {/* {uploadImage && (
-              <Image
-                source={{ uri: uploadImage }}
-                style={{
-                  width: 100,
-                  height: 100,
-                }}
-              />
-            )} */}
           </View>
 
           {/* input */}
@@ -923,7 +1004,11 @@ const ChatbotSupport = ({ route }) => {
             </View>
           </View> */}
           {showFeedback && (
-            <FeedbackModal onRestartChat={() => setShowFeedBack(false)} />
+            <FeedbackModal
+              onRestartChat={() => setShowFeedBack(false)}
+              orderType={orderType}
+              orderId={orderId}
+            />
           )}
         </View>
 

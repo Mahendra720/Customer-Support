@@ -9,7 +9,7 @@
 //   );
 // };
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   SafeAreaView,
   View,
@@ -22,75 +22,74 @@ import {
   Platform,
   ScrollView,
   Keyboard,
-} from 'react-native';
-import { useRating } from '../store/RatingContext';
+} from "react-native";
+import { useRating } from "../store/RatingContext";
 
-export default function ChatbotFeedback({ navigation }) {
+export default function ChatbotFeedback({ navigation, route }) {
+  const { orderType, orderId } = route.params;
   const ratings = [
-    { id: 1, emoji: '😠', label: 'Poor' },
-    { id: 2, emoji: '☹️', label: 'Bad' },
-    { id: 3, emoji: '😐', label: 'Okay' },
-    { id: 4, emoji: '🙂', label: 'Good' },
-    { id: 5, emoji: '😍', label: 'Excellent' },
+    { id: 1, emoji: "😠", label: "Poor" },
+    { id: 2, emoji: "☹️", label: "Bad" },
+    { id: 3, emoji: "😐", label: "Okay" },
+    { id: 4, emoji: "🙂", label: "Good" },
+    { id: 5, emoji: "😍", label: "Excellent" },
   ];
 
   const feedbackSets = {
     1: {
-      question: 'What went wrong with your experience?',
+      question: "What went wrong with your experience?",
       options: [
-        'The support was not helpful',
-        'Response was delayed',
-        'Issue not resolved',
-        'Other issues',
+        "The support was not helpful",
+        "Response was delayed",
+        "Issue not resolved",
+        "Other issues",
       ],
     },
     2: {
-      question: 'What could be improved?',
+      question: "What could be improved?",
       options: [
-        'Response time',
-        'Resolution process',
-        'Support executive attitude',
-        'Communication clarity',
+        "Response time",
+        "Resolution process",
+        "Support executive attitude",
+        "Communication clarity",
       ],
     },
     3: {
-      question: 'What did you find okay about the interaction?',
+      question: "What did you find okay about the interaction?",
       options: [
-        'Response time was acceptable',
-        'Resolution was partial',
-        'Support could be more proactive',
-        'Experience was average',
+        "Response time was acceptable",
+        "Resolution was partial",
+        "Support could be more proactive",
+        "Experience was average",
       ],
     },
     4: {
-      question: 'What did you like about the interaction?',
+      question: "What did you like about the interaction?",
       options: [
-        'Support executive understood the issue',
-        'Response was quick',
-        'Issue resolved properly',
-        'Helpful and polite support',
+        "Support executive understood the issue",
+        "Response was quick",
+        "Issue resolved properly",
+        "Helpful and polite support",
       ],
     },
     5: {
-      question: 'What did you like about the interaction?',
+      question: "What did you like about the interaction?",
       options: [
-        'The support executive went out of their way to help me',
+        "The support executive went out of their way to help me",
         "I'm happy with the resolution",
-        'I received a quick response',
-        'The support executive understood the issue correctly',
+        "I received a quick response",
+        "The support executive understood the issue correctly",
       ],
     },
   };
 
   const { rating: selectedRating, setRating: setSelectedRating } = useRating();
   const [selectedLikes, setSelectedLikes] = useState([]);
-  const [feedback, setFeedback] = useState('');
+  const [feedback, setFeedback] = useState("");
 
   const toggleLikeOption = (index) => {
     setSelectedLikes((prev) =>
-      prev.includes(index)
-        ? prev.filter((i) => i !== index)
-        : [...prev, index]
+      prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
 
@@ -101,18 +100,24 @@ export default function ChatbotFeedback({ navigation }) {
       likes: selectedLikes.map((i) => currentOptions[i]),
       feedback: feedback.trim(),
     };
-    Alert.alert('Feedback submitted', JSON.stringify(payload, null, 2));
+    // navigation.navigate("ChatbotSupport", {
+    //   rating: selectedRating,
+    //   orderType,
+    //   orderId,
+    // });
+    Alert.alert("Feedback submitted", JSON.stringify(payload, null, 2));
   };
 
   const currentSet = feedbackSets[selectedRating ?? 0];
   const currentOptions = currentSet?.options ?? [];
 
-  const selectedLabel = ratings.find((r) => r.id === selectedRating)?.label ?? '';
+  const selectedLabel =
+    ratings.find((r) => r.id === selectedRating)?.label ?? "";
 
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.container}
       >
         {/* <View style={styles.headerRow}>
@@ -229,18 +234,18 @@ export default function ChatbotFeedback({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
+  safe: { flex: 1, backgroundColor: "#fff" },
   container: { flex: 1 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', padding: 12 },
+  headerRow: { flexDirection: "row", alignItems: "center", padding: 12 },
   backButton: { padding: 6 },
   backArrow: { fontSize: 18 },
   content: { paddingHorizontal: 18, paddingBottom: 20 },
-  question: { fontSize: 16, color: '#333', marginTop: 8 },
+  question: { fontSize: 16, color: "#333", marginTop: 8 },
   ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 10,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   ratingItem: { padding: 4 },
   emoji: { fontSize: 28 },
@@ -248,10 +253,10 @@ const styles = StyleSheet.create({
   selectedLabel: {
     marginLeft: 12,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#1f7d28',
+    fontWeight: "600",
+    color: "#1f7d28",
   },
-  likesContainer: { marginTop: 10, flexDirection: 'row', flexWrap: 'wrap' },
+  likesContainer: { marginTop: 10, flexDirection: "row", flexWrap: "wrap" },
   pill: {
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -260,34 +265,34 @@ const styles = StyleSheet.create({
     marginRight: 6,
     marginBottom: 8,
   },
-  pillSelected: { backgroundColor: '#1f7d28', borderColor: '#1f7d28' },
-  pillUnselected: { backgroundColor: 'transparent', borderColor: '#ccc' },
-  pillText: { color: '#333', fontSize: 14 },
-  pillTextSelected: { color: '#fff' },
+  pillSelected: { backgroundColor: "#1f7d28", borderColor: "#1f7d28" },
+  pillUnselected: { backgroundColor: "transparent", borderColor: "#ccc" },
+  pillText: { color: "#333", fontSize: 14 },
+  pillTextSelected: { color: "#fff" },
   textInput: {
     height: 120,
     borderBottomWidth: 2,
-    borderColor: '#1f7d28',
+    borderColor: "#1f7d28",
     marginTop: 10,
     padding: 10,
     fontSize: 15,
     borderRadius: 6,
   },
   footer: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
     bottom: 10,
     paddingHorizontal: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   submitButton: {
-    width: '95%',
-    backgroundColor: '#1f7d28',
+    width: "95%",
+    backgroundColor: "#1f7d28",
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
-  submitDisabled: { backgroundColor: '#a6caa5' },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  submitDisabled: { backgroundColor: "#a6caa5" },
+  submitText: { color: "#fff", fontSize: 16, fontWeight: "600" },
 });

@@ -13,7 +13,10 @@ import { getCurrentTime } from "../lib/utils";
 // }
 
 const Bot = ({ response, handleClick }) => {
-  if (response.message.includes("conversation has been ended")) {
+  if (
+    response.message.includes("conversation has been ended") ||
+    response.message.includes("you rated this conversation")
+  ) {
     return (
       <View
         style={{
@@ -24,9 +27,7 @@ const Bot = ({ response, handleClick }) => {
           width: "90%",
         }}
       >
-        <Text style={{ textAlign: "center" }}>
-          ✅ This conversation has been closed
-        </Text>
+        <Text style={{ textAlign: "center" }}>✅ {response.message}</Text>
       </View>
     );
   }

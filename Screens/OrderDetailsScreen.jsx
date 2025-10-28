@@ -226,6 +226,7 @@ export default function OrderDetailScreen({ route, navigation }) {
                 products: order.products, // or order.items depending on your data
                 orderType: order.status, // e.g., 'delivered', 'returned', etc.
                 orderId: order.id,
+                rating: "",
               })
             }
           >

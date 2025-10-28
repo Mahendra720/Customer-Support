@@ -132,7 +132,7 @@ export const fetchOrders = async () => {
         ],
       },
       {
-        id: "order4",
+        id: "OD1234",
         date: "29th Sep 25, 8:40 am",
         price: "₹89.99",
         status: "replaced",

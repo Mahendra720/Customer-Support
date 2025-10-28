@@ -1,4 +1,3 @@
-
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { TouchableOpacity, Text, View } from "react-native";
@@ -12,7 +11,7 @@ const emojis = [
   { id: 5, symbol: "😍", label: "Excellent" },
 ];
 
-const FeedbackModal = () => {
+const FeedbackModal = ({ orderType, orderId }) => {
   const { rating, setRating } = useRating();
   const navigation = useNavigation();
 
@@ -43,7 +42,7 @@ const FeedbackModal = () => {
             key={e.id}
             onPress={() => {
               setRating(e.id);
-              navigation.navigate("ChatbotFeedback");
+              navigation.navigate("ChatbotFeedback", { orderType, orderId });
             }}
             style={{
               padding: 5,
@@ -67,4 +66,3 @@ const FeedbackModal = () => {
 };
 
 export default FeedbackModal;
-
