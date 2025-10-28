@@ -207,7 +207,9 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   sectionTitle: {
-    fontSize: 18,
+    padding:5,
+    fontSize: 16,
+    textAlign:'center',
     fontWeight: "700",
     color: "#1E3A8A",
     marginHorizontal: 16,
@@ -247,7 +249,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#64748B",
     marginBottom: 10,
-    marginLeft: 6,
+    textAlign:'center',
+    fontWeight:'700'
   },
 
   /* 🔹 FOOTER */

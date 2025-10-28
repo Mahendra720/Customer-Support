@@ -829,15 +829,24 @@ const ChatbotSupport = ({ route }) => {
     setLoading(false);
   };
 
-  const renderItem = ({ item, index }) => {
-    const isBot = item.type === "bot";
+  // const renderItem = ({ item, index }) => {
+  //   const isBot = item.type === "bot";
 
-    return isBot ? (
-      <Bot key={index} response={item} handleClick={handleClickQuery} />
-    ) : (
-      <User key={index} response={item} />
-    );
-  };
+  //   return isBot ? (
+  //     <Bot key={index} response={item} handleClick={handleClickQuery} />
+  //   ) : (
+  //     <User key={index} response={item} />
+  //   );
+  // };
+
+  const renderItem = ({ item, index }) => {
+  const isBot = item.type === "bot";
+  
+  return isBot ? ( <Bot key={index} response={item} handleClick={handleClickQuery} /> ) 
+  : ( <User key={index} response={item} /> );
+ 
+};
+
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -856,6 +865,8 @@ const ChatbotSupport = ({ route }) => {
         <View
           style={{
             flex: 1,
+            backgroundColor:'lightgray',
+
           }}
         >
           {/* chat messages */}
@@ -870,9 +881,11 @@ const ChatbotSupport = ({ route }) => {
                 gap: 20,
                 paddingHorizontal: 10,
                 paddingVertical: 10,
+                
               }}
               style={{
-                paddingBottom: 50,
+                paddingBottom: 100,
+                borderColor:'red',
               }}
               ListFooterComponent={loading ? <TypingIndicator /> : null}
             />
@@ -887,43 +900,9 @@ const ChatbotSupport = ({ route }) => {
             )} */}
           </View>
 
-          {/* input */}
-          {/* <View
-            style={{
-              height: 80,
-              backgroundColor: "white",
-              justifyContent: "center",
-              paddingHorizontal: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 5,
-            }}
-          >
-            <TextInput
-              placeholder="Type your query here."
-              style={{
-                flex: 1,
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 100,
-              }}
-            />
-            <View
-              style={{
-                height: 40,
-                width: 40,
-                justifyContent: "center",
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: "gray",
-                borderRadius: 100,
-              }}
-            >
-              <Ionicons name="send" size={20} />
-            </View>
-          </View> */}
           {showFeedback && (
-            <FeedbackModal onRestartChat={() => setShowFeedBack(false)} />
+            <FeedbackModal onRestartChat={() => setShowFeedBack(false)} 
+            style={{backgroundColor:'black'}}/>
           )}
         </View>
 
@@ -940,7 +919,8 @@ const ChatbotSupport = ({ route }) => {
             }
             handleSubmit={handleSubmit}
           />
-        )}
+        )
+        }
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
