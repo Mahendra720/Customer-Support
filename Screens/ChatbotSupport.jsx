@@ -141,8 +141,8 @@ const initialState = {
 // home
 // const BASE_URL = "http://10.223.171.9:8000/api";
 // work
-const BASE_URL = "http://192.168.54.108:8000/api";
-// const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
+// const BASE_URL = "http://192.168.54.108:8000/api";
+const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
 
 const ChatbotSupport = ({ route }) => {
   const { orderType, orderId, rating } = route.params;
