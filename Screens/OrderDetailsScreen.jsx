@@ -13,7 +13,6 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function OrderDetailScreen({ route, navigation }) {
   const { order } = route.params;
-  console.log(order);
 
   // Animations
   const scaleChat = useRef(new Animated.Value(1)).current;

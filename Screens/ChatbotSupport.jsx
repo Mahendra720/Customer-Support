@@ -38,7 +38,7 @@ const initialState = {
         {
           id: "modifying_order",
           name: "Modifying Order",
-          category: "orders_related",
+          // category: "orders_related",
         },
         {
           id: "reschedule_order",
@@ -141,8 +141,8 @@ const initialState = {
 // home
 // const BASE_URL = "http://10.223.171.9:8000/api";
 // work
-// const BASE_URL = "http://192.168.54.108:8000/api";
-const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
+const BASE_URL = "http://192.168.54.108:8000/api";
+// const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
 
 const ChatbotSupport = ({ route }) => {
   const { orderType, orderId, rating } = route.params;
@@ -388,6 +388,7 @@ const ChatbotSupport = ({ route }) => {
       option.category === "replacement_queries"
     ) {
       handleReplacementQueries(option);
+      setValue("");
       return;
     }
 
@@ -420,6 +421,7 @@ const ChatbotSupport = ({ route }) => {
       };
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
+      setValue("");
       return;
     }
 
@@ -462,6 +464,8 @@ const ChatbotSupport = ({ route }) => {
       // await delay(1000);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
+      setValue("");
+      return;
     }
 
     if (option.id === "missing_item" || option.category === "missing_item") {
@@ -488,6 +492,8 @@ const ChatbotSupport = ({ route }) => {
       // await delay(1000);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
+      setValue("");
+      return;
     }
     // console.log("option", option);
 
@@ -524,6 +530,7 @@ const ChatbotSupport = ({ route }) => {
       await delay(1000);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
+      setValue("");
       return;
     }
 
@@ -577,7 +584,8 @@ const ChatbotSupport = ({ route }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          current_step: option.next_step || "select_delayed_order",
+          // current_step: option.next_step || "select_delayed_order",
+          current_step: option.next_step || "check_order_delay",
           orderId: orderId,
           user_choice: option.id,
         }),
@@ -592,6 +600,7 @@ const ChatbotSupport = ({ route }) => {
       await delay(1000);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
+      setValue("");
       return;
     }
 
@@ -599,6 +608,7 @@ const ChatbotSupport = ({ route }) => {
       option.id === "modifying_order" ||
       option.category === "modifying_order"
     ) {
+      console.log("modifying_order", option);
       if (option.id === "other_reasons") {
         setShowInputModal({
           type: "other_reasons",
@@ -618,7 +628,8 @@ const ChatbotSupport = ({ route }) => {
         return;
       }
 
-      if (option.id === "increase_quantity") {
+      if (option.input) {
+        selectedItem.current = option.name;
         setShowInputModal({
           value: true,
           type: `increase_quantity`,
@@ -646,11 +657,18 @@ const ChatbotSupport = ({ route }) => {
           type: "bot",
           ...data,
         };
+        console.log("modifying_order_data", data);
         await delay(3000);
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
         return;
-      } catch (error) {}
+      } catch (error) {
+        console.log("modifying_order", error);
+      } finally {
+        setLoading(false);
+        setValue("");
+        return;
+      }
     }
 
     if (option.id === "cancel_order" || option.category === "cancel_order") {
@@ -684,10 +702,17 @@ const ChatbotSupport = ({ route }) => {
         };
         await delay(3000);
         setMessages((prev) => [...prev, botMessage]);
-        setLoading(false);
+
         return;
-      } catch (error) {}
+      } catch (error) {
+        console.log("cancel_order", error);
+      } finally {
+        setLoading(false);
+        setValue("");
+        return;
+      }
     }
+
     if (option.id === "damaged_item" || option.category === "damaged_item") {
       console.log("damaged_item", option);
       if (option.id === "upload_image") {
@@ -703,6 +728,7 @@ const ChatbotSupport = ({ route }) => {
           body: JSON.stringify({
             current_step: option.next_step || "show_items",
             orderId: orderId || option.id,
+            selected_item: option.name,
           }),
         });
         const data = await response.json();
@@ -714,7 +740,12 @@ const ChatbotSupport = ({ route }) => {
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
         return;
-      } catch (error) {}
+      } catch (error) {
+        console.log("damaged_item error", error);
+      } finally {
+        setLoading(false);
+        setValue("");
+      }
     }
 
     if (option.id === "wrong_item" || option.category === "wrong_item") {
@@ -751,7 +782,13 @@ const ChatbotSupport = ({ route }) => {
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
         return;
-      } catch (error) {}
+      } catch (error) {
+        console.log("error in wrong_item", error);
+      } finally {
+        setLoading(false);
+        setValue("");
+        return;
+      }
     }
 
     if (option.id === "product_not_available") {
@@ -784,6 +821,7 @@ const ChatbotSupport = ({ route }) => {
 
     setMessages((prev) => [...prev, botResponse]);
     setLoading(false);
+    se;
   };
 
   const renderItem = ({ item, index }) => {
@@ -842,7 +880,11 @@ const ChatbotSupport = ({ route }) => {
         {showInputModal.value && (
           <InputModal
             value={value}
-            text={getInputText(showInputModal.type) || ""}
+            text={
+              showInputModal.type === "increase_quantity"
+                ? getInputText(showInputModal.type, selectedItem.current)
+                : getInputText(showInputModal.type)
+            }
             setValue={setValue}
             onClose={() =>
               setShowInputModal({
