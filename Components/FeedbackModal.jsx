@@ -84,14 +84,14 @@ import { useRating } from "../store/RatingContext";
 const { height } = Dimensions.get("window");
 
 const emojis = [
-  { id: 1, symbol: "😠", label: "Awful", color: "#ff4d4d" },
-  { id: 2, symbol: "☹️", label: "Bad", color: "#ff944d" },
-  { id: 3, symbol: "😐", label: "Okay", color: "#ffcc00" },
-  { id: 4, symbol: "🙂", label: "Good", color: "#4CAF50" },
-  { id: 5, symbol: "😍", label: "Excellent", color: "#00C3FF" },
+  { id: "awful", symbol: "😠", label: "Awful", color: "#ff4d4d" },
+  { id: "bad", symbol: "☹️", label: "Bad", color: "#ff944d" },
+  { id: "average", symbol: "😐", label: "Average", color: "#ffcc00" },
+  { id: "good", symbol: "🙂", label: "Good", color: "#4CAF50" },
+  { id: "excellent", symbol: "😍", label: "Excellent", color: "#00C3FF" },
 ];
 
-const FeedbackModal = ({ visible = true, onClose }) => {
+const FeedbackModal = ({ visible = true, onClose, orderId, orderType }) => {
   const { setRating } = useRating();
   const [selected, setSelected] = useState(null);
   const navigation = useNavigation();
@@ -121,7 +121,11 @@ const FeedbackModal = ({ visible = true, onClose }) => {
     }).start(() => {
       onClose?.();
       // Navigate FIRST to feedback screen
-      navigation.navigate("ChatbotFeedback", { rating: emoji });
+      navigation.navigate("ChatbotFeedback", {
+        rating: emoji,
+        orderId,
+        orderType,
+      });
     });
   };
 

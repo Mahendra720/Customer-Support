@@ -27,12 +27,13 @@ import { useRating } from "../store/RatingContext";
 
 export default function ChatbotFeedback({ navigation, route }) {
   const { orderType, orderId } = route.params;
+  console.log("chatbot feedback", orderId, orderType);
   const ratings = [
-    { id: 1, emoji: "😠", label: "Poor" },
-    { id: 2, emoji: "☹️", label: "Bad" },
-    { id: 3, emoji: "😐", label: "Okay" },
-    { id: 4, emoji: "🙂", label: "Good" },
-    { id: 5, emoji: "😍", label: "Excellent" },
+    { id: "awful", emoji: "😠", label: "Awful" },
+    { id: "bad", emoji: "☹️", label: "Bad" },
+    { id: "average", emoji: "😐", label: "Average" },
+    { id: "good", emoji: "🙂", label: "Good" },
+    { id: "excellent", emoji: "😍", label: "Excellent" },
   ];
 
   const feedbackSets = {
@@ -95,17 +96,17 @@ export default function ChatbotFeedback({ navigation, route }) {
 
   const handleSubmit = () => {
     const currentOptions = feedbackSets[selectedRating ?? 0]?.options ?? [];
-    const payload = {
-      rating: ratings[selectedRating - 1].label,
-      likes: selectedLikes.map((i) => currentOptions[i]),
-      feedback: feedback.trim(),
-    };
-    // navigation.navigate("ChatbotSupport", {
-    //   rating: selectedRating,
-    //   orderType,
-    //   orderId,
-    // });
-    Alert.alert("Feedback submitted", JSON.stringify(payload, null, 2));
+    // const payload = {
+    //   rating: ratings[selectedRating - 1].label,
+    //   likes: selectedLikes.map((i) => currentOptions[i]),
+    //   feedback: feedback.trim(),
+    // };
+    navigation.navigate("ChatbotSupport", {
+      rating: selectedRating,
+      orderType,
+      orderId,
+    });
+    // Alert.alert("Feedback submitted", JSON.stringify(payload, null, 2));
   };
 
   const currentSet = feedbackSets[selectedRating ?? 0];

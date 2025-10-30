@@ -1,5 +1,12 @@
-import React from "react";
-import { Pressable, Text, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  Pressable,
+  Text,
+  View,
+  StyleSheet,
+  Button,
+  TouchableOpacity,
+} from "react-native";
 import { getCurrentTime } from "../lib/utils";
 
 // interface BotProps {
@@ -12,15 +19,37 @@ import { getCurrentTime } from "../lib/utils";
 // }
 
 const Bot = ({ response, handleClick }) => {
+  const [selectedItems, setSelectedItems] = useState([]);
+
+  const handleSelectedItems = (option) => {
+    const isAlreadyExists =
+      selectedItems.findIndex((item) => item.id === option.id) !== -1;
+    if (isAlreadyExists) {
+      const newSelectedItems = selectedItems.filter(
+        (item) => item.id !== option.id
+      );
+      setSelectedItems(newSelectedItems);
+      return;
+    }
+    setSelectedItems((prev) => [...prev, option]);
+  };
+
+  const handleSubmit = () => {
+    const message = selectedItems.map((item) => item.name).join(", ");
+    handleClick({
+      id: response.category,
+      name: message,
+      category: response.category,
+      next_step: response.next_step,
+    });
+  };
   if (
     response.message.includes("conversation has been ended") ||
     response.message.includes("you rated this conversation")
   ) {
     return (
       <View style={styles.conversationEndedContainer}>
-        <Text style={styles.conversationEndedText}>
-          ✅ Conversation completed
-        </Text>
+        <Text style={styles.conversationEndedText}>✅ {response.message}</Text>
 
         {/* Clickable text for still have questions */}
         <Pressable
@@ -37,7 +66,12 @@ const Bot = ({ response, handleClick }) => {
   return (
     <View style={styles.botContainer}>
       {/* Message Header */}
-      <View style={styles.messageHeader}>
+      <View
+        style={[
+          styles.messageHeader,
+          response.options.length === 0 && styles.messageHeaderBorder,
+        ]}
+      >
         <View style={styles.headerRow}>
           <Text style={styles.botName}>Okalbuddy</Text>
           <Text style={styles.timeText}>{getCurrentTime()}</Text>
@@ -48,19 +82,53 @@ const Bot = ({ response, handleClick }) => {
       {/* Options Section */}
       {response.options ? (
         <View style={styles.optionsContainer}>
-          {response.options.map((option, index, arr) => (
-            <Pressable
-              onPress={() => handleClick(option)}
-              style={({ pressed }) => [
-                styles.optionItem,
-                index !== arr.length - 1 && styles.optionItemWithBorder,
-                pressed && styles.optionPressed,
+          {response.options.map((option, index, arr) => {
+            const isActive =
+              selectedItems.findIndex((item) => item.id === option.id) !== -1;
+            return (
+              <Pressable
+                onPress={() =>
+                  response.multi_select
+                    ? handleSelectedItems(option)
+                    : handleClick(option)
+                }
+                style={({ pressed }) => [
+                  styles.optionItem,
+                  index !== arr.length - 1 && styles.optionItemWithBorder,
+                  pressed && styles.optionPressed,
+                ]}
+                key={option.id}
+              >
+                <Text style={styles.optionText}>{option.name}</Text>
+                {response.multi_select && (
+                  <View style={styles.dotContainer}>
+                    <View
+                      style={[styles.dot, isActive && styles.dotActive]}
+                    ></View>
+                  </View>
+                )}
+              </Pressable>
+            );
+          })}
+          {response.multi_select && (
+            <TouchableOpacity
+              disabled={selectedItems.length === 0}
+              onPress={handleSubmit}
+              style={[
+                styles.submitBtn,
+                selectedItems.length > 0 && styles.submitBtnActive,
               ]}
-              key={option.id}
             >
-              <Text style={styles.optionText}>{option.name}</Text>
-            </Pressable>
-          ))}
+              <Text
+                style={[
+                  styles.optionText,
+                  selectedItems.length > 0 && styles.submitBtnTextActive,
+                ]}
+              >
+                Submit
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : (
         <View style={styles.optionsContainer}>
@@ -147,6 +215,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#E5E7EB",
   },
+  messageHeaderBorder: {
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -170,11 +242,14 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   optionsContainer: {
-    paddingVertical: 4,
+    // paddingTop: 4,
   },
   optionItem: {
     paddingVertical: 14,
     paddingHorizontal: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   optionItemWithBorder: {
     borderBottomWidth: 1,
@@ -197,6 +272,40 @@ const styles = StyleSheet.create({
     color: "#D97706",
     fontWeight: "600",
     fontSize: 15,
+  },
+  dotContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 1000,
+    borderColor: "lightgray",
+    backgroundColor: "lightgray",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dot: {
+    width: 14,
+    height: 14,
+    borderRadius: 1000,
+    backgroundColor: "gray",
+  },
+  dotActive: {
+    backgroundColor: "#1E40AF",
+  },
+  submitBtn: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "lightgray",
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  submitBtnActive: {
+    color: "white",
+    backgroundColor: "#1E40AF",
+  },
+  submitBtnTextActive: {
+    color: "white",
   },
 });
 

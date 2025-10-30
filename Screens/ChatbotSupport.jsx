@@ -14,7 +14,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Bot from "../Components/Bot";
 import User from "../Components/User";
 import TypingIndicator from "../Components/TypingIndicator";
-import { delay, getInputText } from "../lib/utils";
+import { delay, getData, getInputText, storeData } from "../lib/utils";
 import InputModal from "../Components/InputModal";
 import FeedbackModal from "../Components/FeedbackModal";
 import * as ImagePicker from "expo-image-picker";
@@ -161,15 +161,22 @@ const ChatbotSupport = ({ route }) => {
 
   const scrollToEndRef = useRef(null);
 
+  console.log(rating, messages);
   useEffect(() => {
-    if (rating) {
-      const botMessage = {
-        type: "bot",
-        message: `you rated this conversation as ${rating}`,
-      };
-      setMessages((prev) => [...prev, botMessage]);
+    async function getMessages() {
+      if (rating) {
+        console.log("getting messages..");
+        const botMessage = {
+          type: "bot",
+          message: `you rated this conversation as ${rating}`,
+        };
+        const data = await getData();
+        setMessages([...data, botMessage]);
+        console.log("localStorage Data", data);
+      }
     }
-  }, [rating]);
+    getMessages();
+  }, []);
 
   useEffect(() => {
     async function fetchInitial() {
@@ -196,7 +203,7 @@ const ChatbotSupport = ({ route }) => {
     setTimeout(() => {
       scrollToEndRef.current?.scrollToEnd({ animated: true });
     }, 100);
-  }, [messages.length]);
+  }, [messages]);
 
   const handleUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -365,20 +372,28 @@ const ChatbotSupport = ({ route }) => {
       const botMessage = {
         type: "bot",
         message: "This conversation has been ended",
+        options: [],
       };
       await delay(300);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
       await delay(500);
       setShowFeedBack(true);
+      const value = messages.map((msg) => ({
+        type: msg.type,
+        message: msg.message,
+        options: [],
+      }));
 
+      await storeData([...value, botMessage]);
       return;
     }
 
     if (option.id === "main_menu") {
       await delay(500);
 
-      setMessages((prev) => [...prev, prev[0]]);
+      setMessages((prev) => [...prev, ...initialState[orderType]]);
+
       setLoading(false);
       return;
     }
@@ -871,6 +886,8 @@ const ChatbotSupport = ({ route }) => {
 
           {showFeedback && (
             <FeedbackModal
+              orderId={orderId}
+              orderType={orderType}
               onRestartChat={() => setShowFeedBack(false)}
               style={{ backgroundColor: "black" }}
             />
