@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   //   borderColor: "#F3F4F6",
   // },
   optionPressed: {
-    backgroundColor: "#F9FAFB",
+    backgroundColor: colors.user,
   },
   optionText: {
     color:colors.botBuddy,

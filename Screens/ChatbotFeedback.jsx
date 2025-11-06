@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     bottom: 10,
     paddingHorizontal: 16,
     alignItems: "center",
+    marginBottom:0,
   },
   submitButton: {
     width: "95%",
