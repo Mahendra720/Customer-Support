@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "https://chatbot-backend-bz65.vercel.app/api/faqs/";
+const API_BASE = "https://chatbot-backend-liart-kappa.vercel.app/api/faqs/";
 const norm = (s) =>
   String(s || "")
     .trim()

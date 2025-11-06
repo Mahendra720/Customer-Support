@@ -40,11 +40,11 @@ const initialState = {
           name: "Modifying Order",
           // category: "orders_related",
         },
-        {
-          id: "reschedule_order",
-          name: "Reschedule Order",
-          category: "orders_related",
-        },
+        // {
+        //   id: "reschedule_order",
+        //   name: "Reschedule Order",
+        //   category: "orders_related",
+        // },
         {
           id: "cancel_order",
           name: "Cancel Order",
@@ -141,7 +141,7 @@ const initialState = {
 // home
 // const BASE_URL = "http://10.223.171.9:8000/api";
 // work
-// const BASE_URL = "http://192.168.54.108:8000/api";
+// const BASE_URL = "http://192.168.1.39:8000/api";
 const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
 
 const ChatbotSupport = ({ route }) => {
@@ -152,27 +152,22 @@ const ChatbotSupport = ({ route }) => {
   const [value, setValue] = useState("");
   const [showFeedback, setShowFeedBack] = useState(false);
   const [showInputModal, setShowInputModal] = useState({
+    type: "",
     value: false,
-    type: "product_not_available",
   });
-
-  const selectedSlot = useRef(null);
-  const selectedItem = useRef(null);
 
   const scrollToEndRef = useRef(null);
 
-  console.log(rating, messages);
   useEffect(() => {
     async function getMessages() {
       if (rating) {
-        console.log("getting messages..");
         const botMessage = {
           type: "bot",
           message: `you rated this conversation as ${rating}`,
         };
         const data = await getData();
         setMessages([...data, botMessage]);
-        console.log("localStorage Data", data);
+        // console.log("localStorage Data", data);
       }
     }
     getMessages();
@@ -213,7 +208,7 @@ const ChatbotSupport = ({ route }) => {
 
     if (!result.canceled) {
       const fileUri = result.assets[0].uri;
-      console.log(result.assets[0]);
+      // console.log(result.assets[0]);
       const formData = new FormData();
       formData.append(
         "image",
@@ -265,7 +260,7 @@ const ChatbotSupport = ({ route }) => {
       handleClickQuery({
         id: "issue_with_delivery_partner",
         name: value,
-        next_step: "collect_description",
+        next_step: "confirm_report",
       });
     } else if (showInputModal.type === "enter_quantity") {
       handleClickQuery({
@@ -358,14 +353,23 @@ const ChatbotSupport = ({ route }) => {
       return;
     }
 
-    const userQuery = {
-      type: "user",
-      message: option.name,
-    };
-
-    setMessages((prev) => [...prev, userQuery]);
-    await delay(300);
-    setLoading(true);
+    if (option.id === "other_issue" || option.id === "upload_image") {
+    } else {
+      const userQuery = {
+        type: "user",
+        message: option.name,
+      };
+      setMessages((prev) => [
+        ...prev.map((msg) => ({
+          type: msg.type,
+          message: msg.message,
+          options: [],
+        })),
+        userQuery,
+      ]);
+      await delay(300);
+      setLoading(true);
+    }
 
     // Check for end conversation
     if (option.id === "end_conversation") {
@@ -553,7 +557,7 @@ const ChatbotSupport = ({ route }) => {
       option.id === "reschedule_order" ||
       option.category === "reschedule_order"
     ) {
-      console.log(option);
+      console.log("reschedule_order", option);
       if (option.id === "Customized time slot") {
         setShowInputModal({
           value: true,
@@ -793,6 +797,7 @@ const ChatbotSupport = ({ route }) => {
           type: "bot",
           ...data,
         };
+
         await delay(1000);
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
@@ -828,7 +833,7 @@ const ChatbotSupport = ({ route }) => {
 
     const response = await fetch(`${url}`);
     const data = await response.json();
-    console.log(url);
+
     const botResponse = {
       type: "bot",
       ...data,
@@ -836,7 +841,6 @@ const ChatbotSupport = ({ route }) => {
 
     setMessages((prev) => [...prev, botResponse]);
     setLoading(false);
-    se;
   };
 
   const renderItem = ({ item, index }) => {
@@ -861,7 +865,8 @@ const ChatbotSupport = ({ route }) => {
           style={{
             flex: 1,
             marginTop: -40,
-            backgroundColor: "lightgray",
+            backgroundColor: "white",
+            // backgroundColor: "#98FF98",
             paddingVertical: 10,
             // paddingBottom: 120,
           }}
