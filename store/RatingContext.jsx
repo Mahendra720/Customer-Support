@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext } from "react";
+import { colors } from "../colors";
 
 // 1️⃣ Create the context
 const RatingContext = createContext();
@@ -8,7 +9,7 @@ export const RatingProvider = ({ children }) => {
     const [rating, setRating] = useState(null);
 
     return (
-        <RatingContext.Provider value={{ rating, setRating }}>
+        <RatingContext.Provider value={{ rating, setRating}} colors={colors}>
             {children}
         </RatingContext.Provider>
     );

@@ -1,6 +1,7 @@
 import { Text, View, StyleSheet } from "react-native";
 import { getCurrentTime } from "../lib/utils";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../colors";
 
 const User = ({ response }) => {
   return (
@@ -30,6 +31,10 @@ const styles = StyleSheet.create({
     width: "auto",
     maxWidth: "85%",
     borderRadius: 10,
+    borderTopLeftRadius: 20,
+  borderTopRightRadius: 20,
+  borderBottomLeftRadius: 20,
+  borderBottomRightRadius: 4,
     marginBottom: 16,
     marginLeft: "auto",
     shadowColor: "#000",
@@ -44,10 +49,10 @@ const styles = StyleSheet.create({
 messageHeader: {
   paddingHorizontal: 16,
   paddingVertical: 12,
-  backgroundColor: "#F3E8FF", // Light purple
+  backgroundColor:colors.user, // Light purple
 },
 userName: {
-  color: "#6B21A8", // Dark purple
+  color: 'black', // Dark purple
   fontSize: 14,
   fontWeight: "700",
 },
@@ -70,6 +75,7 @@ messageText: {
   },
   timeText: {
     fontSize: 12,
+    marginLeft:'25',
     color: "#475569", // Darker gray
     fontWeight: "500"
   },

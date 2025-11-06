@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { colors } from "../colors";
 import {
   Pressable,
   Text,
@@ -73,7 +74,7 @@ const Bot = ({ response, handleClick }) => {
         ]}
       >
         <View style={styles.headerRow}>
-          <Text style={styles.botName}>Okalbuddy</Text>
+          <Text style={styles.botName}>Bot Buddy</Text>
           <Text style={styles.timeText}>{getCurrentTime()}</Text>
         </View>
         <Text style={styles.messageText}>{response.message}</Text>
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   botContainer: {
-    backgroundColor: "white",
+    backgroundColor: colors.botBackground,
     width: "auto",
     maxWidth: "85%",
     borderRadius: 20,
@@ -226,41 +227,61 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   botName: {
-    color: "#1E40AF",
+    color: colors.botBuddy,
     fontSize: 16,
     fontWeight: "700",
   },
   timeText: {
     fontSize: 12,
-    color: "#6B7280",
+    color: colors.timestamp,
     fontWeight: "500",
   },
   messageText: {
     fontSize: 16,
     lineHeight: 22,
-    color: "#1E40AF",
-    fontWeight: "500",
+    color: colors.question,
+    fontWeight: "600",
   },
   optionsContainer: {
     // paddingTop: 4,
   },
+  // optionItem: {
+  //   paddingVertical: 14,
+  //   paddingHorizontal: 16,
+  //   flexDirection: "row",
+  //   justifyContent: "space-between",
+  //   alignItems: "center",
+  // },
   optionItem: {
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  optionItemWithBorder: {
-    borderBottomWidth: 1,
-    borderColor: "#F3F4F6",
-  },
+  backgroundColor: colors.optionItems,       // light button background
+  paddingVertical: 12,
+  paddingHorizontal: 16,
+  marginVertical: 6,
+  marginHorizontal:10,
+  justifyContent: 'center', 
+  alignItems: 'center',   
+  marginHorizontal:10,
+  borderRadius: 10,
+  flexDirection: "row",
+  borderWidth: 1,
+  borderColor: "#d0d8e0",
+  // shadowColor: "#000",
+  // shadowOpacity: 0.08,
+  // shadowOffset: { width: 0, height: 1 },
+  // shadowRadius: 3,
+  // elevation: 1,
+},
+
+  // optionItemWithBorder: {
+  //   borderBottomWidth: 1,
+  //   borderColor: "#F3F4F6",
+  // },
   optionPressed: {
     backgroundColor: "#F9FAFB",
   },
   optionText: {
-    color: "#374151",
-    fontWeight: "600",
+    color:colors.botBuddy,
+    fontWeight: "700",
     fontSize: 15,
   },
   gotItText: {

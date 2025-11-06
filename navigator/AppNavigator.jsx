@@ -64,7 +64,9 @@ export default function AppNavigator() {
         name="ChatbotSupport"
         component={ChatbotSupport}
         options={{
-          title: "Okal Support",
+          title: "Bot Support",
+          headerTitleAlign: 'center',
+          
         }}
       />
       <Stack.Screen
