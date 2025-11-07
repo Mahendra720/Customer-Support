@@ -517,7 +517,7 @@ const ChatbotSupport = ({ route }) => {
         type: "bot",
         ...data,
       };
-      await delay(500);
+      await delay(1000);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
       setValue("");
