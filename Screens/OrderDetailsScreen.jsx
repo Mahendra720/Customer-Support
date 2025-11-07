@@ -1,4 +1,7 @@
 import React, { useRef } from "react";
+import * as Print from "expo-print";
+import * as Sharing from "expo-sharing";
+
 import {
   View,
   Text,
@@ -62,25 +65,134 @@ export default function OrderDetailScreen({ route, navigation }) {
     },
   ];
 
-  const bill = order.bill || {
-    itemTotal: "₹104",
-    handling: "₹10.99",
-    delivery: "₹0",
-    gstOnFees: "₹0.55",
-    total: order.price || "₹115.54",
-    saved: "₹34",
-    struck: "₹151.54",
+  
+
+  
+
+  
+  // ✅ Correct Dynamic Bill Calculation
+  const parseRupee = (val) =>
+    Number(val?.toString().replace(/[₹,\s]/g, "")) || 0;
+
+  const itemTotal = items.reduce(
+    (sum, item) => sum + parseRupee(item.price),
+    0
+  );
+  const totalMrp = items.reduce(
+    (sum, item) => sum + parseRupee(item.mrp),
+    0
+  );
+
+  const handling = 15; // fixed charge
+  const delivery = 45; // fixed charge
+  const gstOnFees = ((handling + delivery) * 0.18).toFixed(2);
+  const saved = totalMrp - itemTotal;
+  const total = (
+    itemTotal +
+    handling +
+    delivery +
+    parseFloat(gstOnFees)
+  ).toFixed(2);
+  const struck = (parseFloat(total) + saved).toFixed(2);
+
+  const bill = {
+    itemTotal: `₹${itemTotal.toFixed(2)}`,
+    handling: `₹${handling.toFixed(2)}`,
+    delivery: `₹${delivery.toFixed(2)}`,
+    gstOnFees: `₹${gstOnFees}`,
+    total: `₹${total}`,
+    saved: `₹${saved.toFixed(2)}`,
+    struck: `₹${struck}`,
   };
 
   const meta = order.meta || {
     orderId: order.id || "—",
-    receiverName: "----------",
-    receiverPhone: "----------",
-    addressLine: "------------",
+    receiverName: "Mahi",
+    receiverPhone: "9876543210",
+    addressLine: "PBHouse, Madhapur",
     placedAt: order.date || "—",
     arrivedAt: "10 mins after order",
   };
 
+  // ✅ Invoice PDF Generation
+  const handleDownloadInvoice = async () => {
+    const html = `
+      <html>
+        <head>
+          <style>
+            body { font-family: Arial; padding: 20px; color: #333; }
+            h1 { text-align: center; color: #6c2bd9; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; font-size: 14px; text-align: left; }
+            th { background-color: #f7ecff; color: #6c2bd9; }
+            tfoot td { font-weight: bold; border-top: 2px solid #aaa; }
+            .summary { margin-top: 20px;margin-left:520px; }
+            .total { color: #2e7d32; font-size: 16px; font-weight: bold; }
+
+          </style>
+        </head>
+        <body>
+          <h1>Order Invoice</h1>
+          <p><strong>Order ID:</strong> ${meta.orderId}</p>
+          <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+          <p><strong>Receiver:</strong> ${meta.receiverName}</p>
+          <p><strong>Address:</strong> ${meta.addressLine}</p>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Price</th>
+                <th>MRP</th>
+              </tr>
+
+              
+            </thead>
+            <tbody>
+              ${items
+                .map(
+                  (it) => `
+                  <tr>
+                    <td>${it.name}</td>
+                    <td>${it.qty}</td>
+                    <td>${it.price}</td>
+                    <td>${it.mrp}</td>
+                  </tr>`
+                )
+                .join("")}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3">Total Bill</td>
+                <td>${bill.itemTotal}</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <div class="summary" >
+            <p>Item Total: ${bill.itemTotal}</p>
+            <p>Handling Charges: ${bill.handling}</p>
+            <p>Delivery: ${bill.delivery}</p>
+            <p>GST on Fees: ${bill.gstOnFees}</p>
+            <p class="total">Final Amount: ${bill.total}</p>
+            <p style="color: #1e824c;">You saved ${bill.saved} on this order!</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+    try {
+      const { uri } = await Print.printToFileAsync({ html });
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        alert("Sharing not available on this device");
+      }
+    } catch (err) {
+      console.error("Error generating invoice:", err);
+    }
+  };
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
@@ -115,7 +227,13 @@ export default function OrderDetailScreen({ route, navigation }) {
             <TouchableWithoutFeedback
               onPressIn={() => animatePressIn(scaleChat)}
               onPressOut={() => animatePressOut(scaleChat)}
-              onPress={() => navigation.navigate("HelpIssue", { order })}
+               onPress={() =>
+              navigation.navigate("ChatbotSupport", {
+                products: order.products, // or order.items depending on your data
+                orderType: order.status, // e.g., 'delivered', 'returned', etc.
+                orderId: order.id,
+                rating: "",
+              })}
             >
               <Animated.View
                 style={[
@@ -183,11 +301,16 @@ export default function OrderDetailScreen({ route, navigation }) {
             <Text style={styles.savePillText}>SAVED {bill.saved}</Text>
           </View>
 
-          <TouchableOpacity style={styles.downloadBtn}>
+          {/* <TouchableOpacity style={styles.downloadBtn}>
             <Text style={styles.downloadText}>
               Download Invoice / Credit Note
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+           <TouchableOpacity style={styles.downloadBtn} onPress={handleDownloadInvoice}>
+  <Text style={styles.downloadText}>
+    Download Invoice / Credit Note
+  </Text>
+</TouchableOpacity>
         </View>
 
         {/* Order Details */}
