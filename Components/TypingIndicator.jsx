@@ -1,5 +1,6 @@
 import { Text, View, Animated } from "react-native";
 import { useEffect, useRef } from "react";
+import { colors } from "../colors";
 
 const TypingIndicator = () => {
   const dot1 = useRef(new Animated.Value(0)).current;
@@ -96,8 +97,8 @@ const styles = {
     height: 20,
   },
   dot: {
-    fontSize: 8,
-    color: "#1E40AF",
+    fontSize: 12,
+    color: colors.botBuddy,
     marginHorizontal: 2,
   },
 };

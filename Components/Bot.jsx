@@ -99,8 +99,8 @@ const Bot = ({ response, handleClick }) => {
                   pressed && styles.optionPressed,
                 ]}
                 key={option.id}
-              >
-                <Text style={styles.optionText}>{option.name}</Text>
+              ><View style={styles.mdcontainer}>
+               <Text style={styles.optionText}>{option.name}</Text>
                 {response.multi_select && (
                   <View style={styles.dotContainer}>
                     <View
@@ -108,6 +108,7 @@ const Bot = ({ response, handleClick }) => {
                     ></View>
                   </View>
                 )}
+              </View>
               </Pressable>
             );
           })}
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
   // },
   optionItem: {
   backgroundColor: colors.optionItems,       // light button background
-  paddingVertical: 12,
+  paddingVertical: 6,
   paddingHorizontal: 16,
   marginVertical: 6,
   marginHorizontal:10,
@@ -279,10 +280,16 @@ const styles = StyleSheet.create({
   optionPressed: {
     backgroundColor: colors.user,
   },
+  mdcontainer:{
+   display:'flex',
+   justifyContent:'space-between',
+   
+  },
   optionText: {
     color:colors.botBuddy,
     fontWeight: "700",
-    fontSize: 15,
+    fontSize: 16,
+    paddingTop:6
   },
   gotItText: {
     color: "#059669",
@@ -299,15 +306,19 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 1000,
     borderColor: "lightgray",
-    backgroundColor: "lightgray",
+    // backgroundColor: "lightgray",
     justifyContent: "center",
     alignItems: "center",
+    marginLeft:250,
+
+    
   },
   dot: {
-    width: 14,
-    height: 14,
+    width: 17,
+    height: 17,
     borderRadius: 1000,
     backgroundColor: "gray",
+    marginBottom:38,
   },
   dotActive: {
     backgroundColor: "#1E40AF",

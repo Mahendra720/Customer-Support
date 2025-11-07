@@ -3,7 +3,7 @@ export const colors = {
     botBuddy: '#0B6B1A',
     question: '#000000',
     options: ' #0B6B1A',
-    user: '#66DBA4',
+    user: '#ADEBB3',
     timestamp: '#696969',
     optionItems: "#FFFFFF",
 
