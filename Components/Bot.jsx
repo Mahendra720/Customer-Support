@@ -18,9 +18,8 @@ import { getCurrentTime } from "../lib/utils";
 //   }) => void;
 // }
 
-const Bot = ({ response, handleClick }) => {
-  const [selectedItems, setSelectedItems] = useState([]);
-
+const Bot = ({ response, handleClick, selectedItems, setSelectedItems }) => {
+  //  const [selectedItems, setSelectedItems] = useState([]);
   const handleSelectedItems = (option) => {
     const isAlreadyExists =
       selectedItems.findIndex((item) => item.id === option.id) !== -1;
@@ -43,6 +42,7 @@ const Bot = ({ response, handleClick }) => {
       next_step: response.next_step,
     });
   };
+
   if (
     response.message.includes("conversation has been ended") ||
     response.message.includes("you rated this conversation")

@@ -80,14 +80,15 @@ const initialState = {
           name: "Check return status",
           category: "returned_orders",
         },
+
         {
-          id: "pickup_issue",
-          name: "Issue with pickup",
+          id: "refund_status",
+          name: "Check refund status",
           category: "returned_orders",
         },
         {
-          id: "refund_status",
-          name: "Refund related query",
+          id: "pickup_not_done",
+          name: "Pickup not done yet",
           category: "returned_orders",
         },
         {
@@ -119,11 +120,6 @@ const initialState = {
           category: "replacement_queries",
         },
         {
-          id: "reschedule_pickup",
-          name: "Reschedule pickup",
-          category: "replacement_queries",
-        },
-        {
           id: "not_received",
           name: "Didn’t receive replacement item",
           category: "replacement_queries",
@@ -146,7 +142,6 @@ const BASE_URL = "https://chatbot-backend-murex-delta.vercel.app/api";
 
 const ChatbotSupport = ({ route }) => {
   const { orderType, orderId, rating } = route.params;
-
   const [messages, setMessages] = useState(initialState[orderType]);
   const [loading, setLoading] = useState(false);
   const [value, setValue] = useState("");
@@ -155,8 +150,11 @@ const ChatbotSupport = ({ route }) => {
     type: "",
     value: false,
   });
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [imageUrl, setImageUrl] = useState(null);
 
   const scrollToEndRef = useRef(null);
+  const selectedItem = useRef(null);
 
   useEffect(() => {
     async function getMessages() {
@@ -209,19 +207,23 @@ const ChatbotSupport = ({ route }) => {
     if (!result.canceled) {
       const fileUri = result.assets[0].uri;
       // console.log(result.assets[0]);
-      const formData = new FormData();
-      formData.append(
-        "image",
-        JSON.stringify({
-          uri: fileUri,
-          name: "damage.jpg",
-          type: "image/jpeg",
-        })
-      );
-      // setUploadImage(fileUri);
+      // const formData = new FormData();
+      // formData.append(
+      //   "image",
+      //   JSON.stringify({
+      //     uri: fileUri,
+      //     name: "damage.jpg",
+      //     type: "image/jpeg",
+      //   })
+      // );
+      setImageUrl(fileUri);
       setMessages((prev) => [
         ...prev,
-        { type: "user", message: `${result.assets[0].fileName}` },
+        {
+          type: "user",
+          message: `${result.assets[0].fileName}`,
+          imageUrl: fileUri,
+        },
       ]);
     }
   };
@@ -250,7 +252,7 @@ const ChatbotSupport = ({ route }) => {
       });
     } else if (showInputModal.type === "increase_quantity") {
       handleClickQuery({
-        id: "modifying_order",
+        id: "add_quantity",
         name: messages[messages.length - 1].message,
         quantity: value,
         category: "modifying_order",
@@ -306,14 +308,13 @@ const ChatbotSupport = ({ route }) => {
   };
 
   const handleReplacementQueries = async (option) => {
-    console.log("replacement_queries", option);
-    if (option.id === "customized_time_slot") {
-      setShowInputModal({
-        value: true,
-        type: "customized_time_slot",
-      });
-      return;
-    }
+    // if (option.id === "customized_time_slot") {
+    //   setShowInputModal({
+    //     value: true,
+    //     type: "customized_time_slot",
+    //   });
+    //   return;
+    // }
     const response = await fetch(`${BASE_URL}/replacement_queries`, {
       method: "POST",
       headers: {
@@ -328,7 +329,7 @@ const ChatbotSupport = ({ route }) => {
       }),
     });
     const data = await response.json();
-    console.log(data);
+
     const botMessage = {
       type: "bot",
       ...data,
@@ -353,7 +354,13 @@ const ChatbotSupport = ({ route }) => {
       return;
     }
 
-    if (option.id === "other_issue" || option.id === "upload_image") {
+    if (
+      option.id === "other_issue" ||
+      option.id === "upload_image" ||
+      option.id === "add_quantity"
+    ) {
+      await delay(100);
+      setLoading(true);
     } else {
       const userQuery = {
         type: "user",
@@ -363,6 +370,7 @@ const ChatbotSupport = ({ route }) => {
         ...prev.map((msg) => ({
           type: msg.type,
           message: msg.message,
+          imageUrl: msg.imageUrl,
           options: [],
         })),
         userQuery,
@@ -383,13 +391,14 @@ const ChatbotSupport = ({ route }) => {
       setLoading(false);
       await delay(500);
       setShowFeedBack(true);
-      const value = messages.map((msg) => ({
-        type: msg.type,
-        message: msg.message,
-        options: [],
-      }));
+      // const value = messages.map((msg) => ({
+      //   type: msg.type,
+      //   message: msg.message,
+      //   imageUrl: msg.imageUrl,
+      //   options: [],
+      // }));
 
-      await storeData([...value, botMessage]);
+      await storeData([...messages, botMessage]);
       return;
     }
 
@@ -480,7 +489,7 @@ const ChatbotSupport = ({ route }) => {
         type: "bot",
         ...data,
       };
-      // await delay(1000);
+      await delay(500);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
       setValue("");
@@ -496,7 +505,7 @@ const ChatbotSupport = ({ route }) => {
         body: JSON.stringify({
           current_step: option.next_step || "select_order",
           orderId: orderId,
-          missing_items: [option.id],
+          missing_items: selectedItems.map((item) => item.name),
           resolution_choice: option.id,
           confirm_report: option.id,
         }),
@@ -508,10 +517,11 @@ const ChatbotSupport = ({ route }) => {
         type: "bot",
         ...data,
       };
-      // await delay(1000);
+      await delay(500);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
       setValue("");
+      setSelectedItems([]);
       return;
     }
     // console.log("option", option);
@@ -546,7 +556,7 @@ const ChatbotSupport = ({ route }) => {
         type: "bot",
         ...data,
       };
-      await delay(1000);
+      await delay(500);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
       setValue("");
@@ -596,6 +606,7 @@ const ChatbotSupport = ({ route }) => {
       setLoading(false);
       return;
     }
+
     if (option.id === "order_delayed" || option.category === "order_delayed") {
       const response = await fetch(`${BASE_URL}/order_delayed`, {
         method: "POST",
@@ -616,7 +627,7 @@ const ChatbotSupport = ({ route }) => {
         type: "bot",
         ...data,
       };
-      await delay(1000);
+      await delay(500);
       setMessages((prev) => [...prev, botMessage]);
       setLoading(false);
       setValue("");
@@ -627,7 +638,17 @@ const ChatbotSupport = ({ route }) => {
       option.id === "modifying_order" ||
       option.category === "modifying_order"
     ) {
-      console.log("modifying_order", option);
+      if (option.input) {
+        console.log("option input");
+        selectedItem.current = option.name;
+        setShowInputModal({
+          value: true,
+          type: "increase_quantity",
+        });
+        setLoading(false);
+        return;
+      }
+
       if (option.id === "other_reasons") {
         setShowInputModal({
           type: "other_reasons",
@@ -647,15 +668,7 @@ const ChatbotSupport = ({ route }) => {
         return;
       }
 
-      if (option.input) {
-        selectedItem.current = option.name;
-        setShowInputModal({
-          value: true,
-          type: `increase_quantity`,
-        });
-        setLoading(false);
-        return;
-      }
+      console.log("modifying_order", option);
 
       try {
         const response = await fetch(`${BASE_URL}/modifying_order`, {
@@ -666,7 +679,7 @@ const ChatbotSupport = ({ route }) => {
           body: JSON.stringify({
             current_step: option.next_step || "show_options",
             orderId: orderId,
-            selectedItem: option.name,
+            selectedItem: option.name || selectedItem.current,
             newAddedItem: option.name,
             quantity: option.quantity,
           }),
@@ -677,7 +690,7 @@ const ChatbotSupport = ({ route }) => {
           ...data,
         };
         console.log("modifying_order_data", data);
-        await delay(3000);
+        await delay(500);
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
         return;
@@ -700,7 +713,7 @@ const ChatbotSupport = ({ route }) => {
         setLoading(false);
         return;
       }
-      console.log("cancel_order", option);
+      // console.log("cancel_order", option);
       try {
         const response = await fetch(`${BASE_URL}/cancel_order`, {
           method: "POST",
@@ -719,7 +732,7 @@ const ChatbotSupport = ({ route }) => {
           type: "bot",
           ...data,
         };
-        await delay(3000);
+        await delay(500);
         setMessages((prev) => [...prev, botMessage]);
 
         return;
@@ -728,6 +741,7 @@ const ChatbotSupport = ({ route }) => {
       } finally {
         setLoading(false);
         setValue("");
+        setSelectedItems([]);
         return;
       }
     }
@@ -755,7 +769,7 @@ const ChatbotSupport = ({ route }) => {
           type: "bot",
           ...data,
         };
-        await delay(1000);
+        await delay(500);
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
         return;
@@ -798,7 +812,7 @@ const ChatbotSupport = ({ route }) => {
           ...data,
         };
 
-        await delay(1000);
+        await delay(500);
         setMessages((prev) => [...prev, botMessage]);
         setLoading(false);
         return;
@@ -821,8 +835,6 @@ const ChatbotSupport = ({ route }) => {
       return;
     }
 
-    await delay(3000);
-
     let url;
 
     if (option.category) {
@@ -839,6 +851,7 @@ const ChatbotSupport = ({ route }) => {
       ...data,
     };
 
+    await delay(500);
     setMessages((prev) => [...prev, botResponse]);
     setLoading(false);
   };
@@ -847,7 +860,13 @@ const ChatbotSupport = ({ route }) => {
     const isBot = item.type === "bot";
 
     return isBot ? (
-      <Bot key={index} response={item} handleClick={handleClickQuery} />
+      <Bot
+        key={index}
+        response={item}
+        handleClick={handleClickQuery}
+        selectedItems={selectedItems}
+        setSelectedItems={setSelectedItems}
+      />
     ) : (
       <User key={index} response={item} />
     );

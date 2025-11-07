@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, Image } from "react-native";
 import { getCurrentTime } from "../lib/utils";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -10,15 +10,26 @@ const User = ({ response }) => {
         <View style={styles.headerRow}>
           <Text style={styles.userName}>You</Text>
           <View style={styles.timeContainer}>
-            <Text style={styles.timeText}>
-              {getCurrentTime()}
-            </Text>
+            <Text style={styles.timeText}>{getCurrentTime()}</Text>
             <Ionicons name="checkmark-done" size={12} color={"#10B981"} />
           </View>
         </View>
-        <Text style={styles.messageText}>
-          {response.message}
-        </Text>
+        {response.imageUrl ? (
+          <Image
+            source={{
+              uri: response.imageUrl,
+            }}
+            style={{
+              width: 250,
+              height: 150,
+              marginTop: 10,
+              objectFit: "fill",
+              borderRadius: 10,
+            }}
+          />
+        ) : (
+          <Text style={styles.messageText}>{response.message}</Text>
+        )}
       </View>
     </View>
   );
@@ -39,29 +50,29 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderWidth: 1,
     borderColor: "#E5E7EB",
-    overflow: 'hidden',
+    overflow: "hidden",
   },
-messageHeader: {
-  paddingHorizontal: 16,
-  paddingVertical: 12,
-  backgroundColor: "#F3E8FF", // Light purple
-},
-userName: {
-  color: "#6B21A8", // Dark purple
-  fontSize: 14,
-  fontWeight: "700",
-},
-messageText: {
-  fontSize: 15,
-  lineHeight: 22,
-  color: "black",
-  fontWeight:500 // Dark purple
-},
+  messageHeader: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: "#F3E8FF", // Light purple
+  },
+  userName: {
+    color: "#6B21A8", // Dark purple
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  messageText: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "black",
+    fontWeight: 500, // Dark purple
+  },
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 6
+    marginBottom: 6,
   },
   timeContainer: {
     flexDirection: "row",
@@ -71,9 +82,8 @@ messageText: {
   timeText: {
     fontSize: 12,
     color: "#475569", // Darker gray
-    fontWeight: "500"
+    fontWeight: "500",
   },
-  
 });
 
 export default User;
